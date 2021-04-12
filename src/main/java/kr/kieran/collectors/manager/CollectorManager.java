@@ -248,9 +248,6 @@ public class CollectorManager
      */
     public void save(Collector collector, Consumer<Collector> consumer)
     {
-        // Wait for lock to unlock
-        while (collector.isLocked()) {}
-
         // Lock
         collector.lock();
 
