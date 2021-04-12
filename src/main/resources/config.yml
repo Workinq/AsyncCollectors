@@ -1,0 +1,27 @@
+mysql:
+  host: localhost
+  port: 3306
+  database: plugins
+  user: everything
+  password: root
+
+collector:
+  item:
+    material: BEACON
+    data: 0
+    name: '&c&lCollector'
+    lore:
+      - '&7Place this collector to automatically collect'
+      - '&7all mob drops and crops in a chunk.'
+
+messages:
+  no-permission: '&cYou do not have permission to use this command.'
+  invalid-usage: '&cInvalid command usage: /collector <player> [amount].'
+  invalid-player: '&cCould not find the player ''%player%''.'
+  invalid-number: '&c%number% is not a valid number.'
+  gave-collector: '&aSuccessfully gave &e%amount%x &acollector(s) to &e%player%&a.'
+  received-collector: '&eYou &areceived &e%amount%x &acollector(s).'
+  chunk-locked: '&cYou can''t modify collectors in this chunk at the moment.'
+  collector-exists: '&cThere is already a collector in this chunk.'
+  placed-collector: '&aSuccessfully placed a collector at the chunk &ex: %x%&a, &ez: %z%&a.'
+  destroyed-collector: '&aYou destroyed a collector, all the contents were sold.'

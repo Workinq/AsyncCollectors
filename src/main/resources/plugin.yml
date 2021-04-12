@@ -1,0 +1,9 @@
+name: ${project.name}
+main: ${project.groupId}.${project.artifactId}
+version: ${project.version}
+author: ${project.author}
+api-version: 1.16
+commands:
+  collector:
+    usage: /<command> <player> <amount>
+    description: Give a player an amount of collectors
