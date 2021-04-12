@@ -12,7 +12,7 @@ public class Collector
 {
 
     // LOCK
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock(true);
     public void lock() { lock.lock(); }
     public void unlock() { lock.unlock(); }
     public boolean isLocked() { return lock.isLocked(); }
