@@ -40,7 +40,7 @@ public class ContentsListeners implements Listener
         long chunkId = entity.getChunk().getChunkKey();
 
         // If the chunk isn't tracked cancel the event
-        if (!plugin.getChunkManager().isTracked(chunkId))
+        if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
             event.setCancelled(true);
             return;
@@ -59,7 +59,6 @@ public class ContentsListeners implements Listener
         for (ItemStack drop : drops)
         {
             Material material = drop.getType();
-            Bukkit.broadcastMessage("drop type: " + material.name() + ", amount: " + drop.getAmount());
             collector.setMaterialAmount(material, collector.getMaterialAmount(material) + drop.getAmount());
         }
 
