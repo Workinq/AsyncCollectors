@@ -42,9 +42,7 @@ public class PlacementListeners implements Listener
         if (item.getDurability() != plugin.getConfig().getInt("collectors.item.data")) return;
         ItemMeta meta = item.getItemMeta();
         if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Color.color(plugin.getConfig().getString("collector.item.name")))) return;
-
-        // Track
-        if (!this.canUseChunk(chunkId))
+        if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
             player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
             event.setCancelled(true);
@@ -83,10 +81,7 @@ public class PlacementListeners implements Listener
 
         // Check
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
-        // TODO: Use persistent thing to label the beacon as a collector
-
-        // Track
-        if (!this.canUseChunk(chunkId))
+        if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
             player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
             event.setCancelled(true);
@@ -107,21 +102,6 @@ public class PlacementListeners implements Listener
                 player.sendMessage(Color.color(plugin.getConfig().getString("messages.destroyed-collector")));
             });
         });
-    }
-
-    /**
-     * Check if the chunk the player is interacting in is either
-     * tracked or locked. If it is not being tracked then it means
-     * the plugin has not yet loaded the data for teh chunk. If the
-     * chunk is locked then it means an operation is currently being
-     * performed on the chunk.
-     *
-     * @param chunkId the id of the chunk to check
-     * @return true if the chunk can be modified and false otherwise
-     */
-    private boolean canUseChunk(long chunkId)
-    {
-        return plugin.getChunkManager().isTracked(chunkId) && !plugin.getChunkManager().isLocked(chunkId);
     }
 
 }
