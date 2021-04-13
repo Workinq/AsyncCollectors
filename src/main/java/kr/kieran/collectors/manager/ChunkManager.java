@@ -25,10 +25,7 @@ public class ChunkManager
      */
     public void lock(long chunkId)
     {
-        synchronized (this.lockedChunks)
-        {
-            this.lockedChunks.add(chunkId);
-        }
+        this.lockedChunks.add(chunkId);
     }
 
     /**
@@ -97,6 +94,21 @@ public class ChunkManager
     public boolean isTracked(long chunkId)
     {
         return trackedChunks.contains(chunkId);
+    }
+
+    /**
+     * Check if the chunk the player is interacting in is either
+     * tracked or locked. If it is not being tracked then it means
+     * the plugin has not yet loaded the data for teh chunk. If the
+     * chunk is locked then it means an operation is currently being
+     * performed on the chunk.
+     *
+     * @param chunkId the id of the chunk to check
+     * @return true if the chunk can be modified and false otherwise
+     */
+    public boolean canUseChunk(long chunkId)
+    {
+        return this.isTracked(chunkId) && !this.isLocked(chunkId);
     }
 
     /**
