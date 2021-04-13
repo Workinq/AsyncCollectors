@@ -25,3 +25,7 @@ messages:
   collector-exists: '&cThere is already a collector in this chunk.'
   placed-collector: '&aSuccessfully placed a collector at the chunk &ex: %x%&a, &ez: %z%&a.'
   destroyed-collector: '&aYou destroyed a collector, all the contents were sold.'
+  contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%total%&a.'
+
+prices:
+  PORKCHOP: 10.0
