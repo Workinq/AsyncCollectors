@@ -63,7 +63,7 @@ public class Database
         try (
                 Connection connection = this.getConnection();
                 PreparedStatement collectors = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `collectors_collectors` (`collector_id` BIGINT NOT NULL, `mode` VARCHAR(9) NOT NULL DEFAULT 'ALL', `location` VARCHAR(255) NOT NULL, PRIMARY KEY (`collector_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-                PreparedStatement contents = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `collectors_contents` (`collector_id` BIGINT NOT NULL, `material` VARCHAR(255) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`collector_id`, `material`), FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+                PreparedStatement contents = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `collectors_contents` (`collector_id` BIGINT NOT NULL, `material` VARCHAR(255) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`collector_id`, `material`), FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
         )
         {
             // Execute
