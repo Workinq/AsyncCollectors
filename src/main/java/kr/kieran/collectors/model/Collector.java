@@ -26,7 +26,7 @@ public class Collector
     public Map<Material, Integer> getContents() { return Collections.unmodifiableMap(contents); }
     public int getMaterialAmount(Material material) { return contents.getOrDefault(material, 0); }
     public void setMaterialAmount(Material material, int amount) { contents.put(material, amount); }
-    public void clearContents() { contents.clear(); }
+    public void clearContents() { contents.replaceAll((material, integer) -> integer = 0); }
 
     // MODE
     private Mode mode;
