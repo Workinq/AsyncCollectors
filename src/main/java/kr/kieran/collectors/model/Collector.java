@@ -27,6 +27,11 @@ public class Collector
     public int getMaterialAmount(Material material) { return contents.getOrDefault(material, 0); }
     public void setMaterialAmount(Material material, int amount) { contents.put(material, amount); }
     public void clearContents() { contents.replaceAll((material, integer) -> integer = 0); }
+    public boolean isEmpty()
+    {
+        if (contents.isEmpty()) return true;
+        return contents.values().stream().noneMatch(amount -> amount > 0);
+    }
 
     // MODE
     private Mode mode;

@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class InteractListeners implements Listener
 {
@@ -60,11 +61,14 @@ public class InteractListeners implements Listener
     {
         // Args
         Player player = event.getPlayer();
+        UUID uniqueId = player.getUniqueId();
         Block block = event.getClickedBlock();
         if (block == null) return;
         long chunkId = block.getChunk().getChunkKey();
 
         // Check
+        if (!player.isSneaking()) return;
+        if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (!player.isSneaking()) return;
         // TODO: Fix check to prevent cancelling placing regular blocks
@@ -78,6 +82,12 @@ public class InteractListeners implements Listener
         // Collector
         Collector collector = plugin.getCollectorManager().getByLocation(block.getLocation());
         if (collector == null) return;
+        if (collector.isEmpty())
+        {
+            player.sendMessage(Color.color(plugin.getConfig().getString("messages.collector-empty")));
+            event.setCancelled(true);
+            return;
+        }
 
         // Cancel
         event.setCancelled(true);
@@ -99,11 +109,17 @@ public class InteractListeners implements Listener
         // Clear
         collector.clearContents();
 
+        // Money
+        plugin.getMoneyManager().queueMoney(uniqueId, finalTotal);
+
         // Save & Inform
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             plugin.getCollectorManager().save(collector, after -> {
-                // TODO: Give the player money using Vault
-                player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.2f", finalTotal))));
+                // Deposit
+                plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getMoneyManager().execute(uniqueId));
+
+                // Inform
+                player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.1f", finalTotal))));
             });
         });
     }

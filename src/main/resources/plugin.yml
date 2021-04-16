@@ -3,6 +3,7 @@ main: ${project.groupId}.${project.artifactId}
 version: ${project.version}
 author: ${project.author}
 api-version: 1.16
+depend: [Vault]
 commands:
   collector:
     usage: /<command> <player> <amount>
