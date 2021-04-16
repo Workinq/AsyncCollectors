@@ -75,8 +75,8 @@ public class CollectorManager
         if (lookup)
         {
             try (
-                Connection connection = plugin.getDatabase().getConnection();
-                PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM `collectors_collectors` WHERE `collector_id` = ? LIMIT 1;")
+                    Connection connection = plugin.getDatabase().getConnection();
+                    PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM `collectors_collectors` WHERE `collector_id` = ? LIMIT 1;")
             )
             {
                 // Set
@@ -117,14 +117,14 @@ public class CollectorManager
      * primary key. If a record doesn't exist {@link CollectorManager#create(long, String, Consumer)}
      * will be called to insert a new one into the database.
      *
-     * @param chunkId the key for the chunk the collector is placed in
+     * @param chunkId  the key for the chunk the collector is placed in
      * @param consumer the consumer to operate on
      */
     public void load(long chunkId, Consumer<Collector> consumer)
     {
         try (
-            Connection connection = plugin.getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM `collectors_collectors` WHERE `collector_id` = ? LIMIT 1;")
+                Connection connection = plugin.getDatabase().getConnection();
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM `collectors_collectors` WHERE `collector_id` = ? LIMIT 1;")
         )
         {
             // Set
@@ -177,8 +177,8 @@ public class CollectorManager
     public void create(long chunkId, String location, Consumer<Collector> consumer)
     {
         try (
-            Connection connection = plugin.getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_collectors` (`collector_id`, `location`) VALUES (?, ?);")
+                Connection connection = plugin.getDatabase().getConnection();
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_collectors` (`collector_id`, `location`) VALUES (?, ?);")
         )
         {
             // Set
@@ -210,20 +210,20 @@ public class CollectorManager
      * case the object needs to be used elsewhere.
      *
      * @param collector the collector to be removed from the database
-     * @param consumer the consumer to then operate on
+     * @param consumer  the consumer to then operate on
      */
     public void delete(Collector collector, Consumer<Collector> consumer)
     {
         try (
-            Connection connection = plugin.getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM `collectors_collectors` WHERE `collector_id` = ?;")
+                Connection connection = plugin.getDatabase().getConnection();
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM `collectors_collectors` WHERE `collector_id` = ?;")
         )
         {
             // Args
             long chunkId = collector.getChunkId();
 
             // Set
-            statement.setLong(1,chunkId);
+            statement.setLong(1, chunkId);
 
             // Delete
             statement.executeUpdate();
@@ -244,7 +244,7 @@ public class CollectorManager
      * code once the save has completed.
      *
      * @param collector the collector to save to the database
-     * @param consumer once the collector is saved, accept the consumer
+     * @param consumer  once the collector is saved, accept the consumer
      */
     public void save(Collector collector, Consumer<Collector> consumer)
     {
@@ -252,8 +252,8 @@ public class CollectorManager
         collector.lock();
 
         try (
-            Connection connection = plugin.getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE `collectors_collectors` SET `mode` = ? WHERE `collector_id` = ?;")
+                Connection connection = plugin.getDatabase().getConnection();
+                PreparedStatement statement = connection.prepareStatement("UPDATE `collectors_collectors` SET `mode` = ? WHERE `collector_id` = ?;")
         )
         {
             // Set
@@ -286,9 +286,9 @@ public class CollectorManager
      * will then insert a new one.
      *
      * @param connection a connection to not open an unnecessary amount
-     * @param collector the collector to save the contents of
-     * @param material the material to delete or save
-     * @param amount the amount of the material
+     * @param collector  the collector to save the contents of
+     * @param material   the material to delete or save
+     * @param amount     the amount of the material
      */
     public void saveContents(Connection connection, Collector collector, Material material, int amount)
     {
@@ -296,7 +296,7 @@ public class CollectorManager
         if (delete)
         {
             try (
-                PreparedStatement statement = connection.prepareStatement("DELETE FROM `collectors_contents` WHERE `collector_id` = ? AND `material` = ?;")
+                    PreparedStatement statement = connection.prepareStatement("DELETE FROM `collectors_contents` WHERE `collector_id` = ? AND `material` = ?;")
             )
             {
                 // Set
@@ -314,7 +314,7 @@ public class CollectorManager
         else
         {
             try (
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_contents` (`collector_id`, `amount`, `material`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `amount` = VALUES(`amount`);")
+                    PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_contents` (`collector_id`, `amount`, `material`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `amount` = VALUES(`amount`);")
             )
             {
                 // Set
