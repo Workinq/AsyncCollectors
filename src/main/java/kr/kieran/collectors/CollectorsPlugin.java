@@ -16,6 +16,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CollectorsPlugin extends JavaPlugin
 {
 
+    // INSTANCE & CONSTRUCT
+    private static CollectorsPlugin instance;
+    public static CollectorsPlugin get() { return instance; }
+    public CollectorsPlugin() { instance = this; }
+
     // DATABASE MANAGER
     private Database database;
     public Database getDatabase() { return database; }
@@ -54,8 +59,6 @@ public class CollectorsPlugin extends JavaPlugin
         this.collectorManager.disable();
         this.chunkManager.disable();
         this.database.disable();
-        this.chunkManager.disable();
-        this.collectorManager.disable();
     }
 
     // REGISTER: MANAGERS
