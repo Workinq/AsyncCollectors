@@ -13,6 +13,9 @@ collector:
     lore:
       - '&7Place this collector to automatically collect'
       - '&7all mob drops and crops in a chunk.'
+  gui:
+    name: '&c&lCollector Menu'
+    rows: 6 # 54 slots in total
 
 messages:
   no-permission: '&cYou do not have permission to use this command.'
@@ -23,8 +26,11 @@ messages:
   received-collector: '&eYou &areceived &e%amount%x &acollector(s).'
   chunk-locked: '&cYou can''t modify collectors in this chunk at the moment.'
   collector-exists: '&cThere is already a collector in this chunk.'
+  creation-fail: '&cAn issue occurred whilst trying to create a new collector.'
   placed-collector: '&aSuccessfully placed a collector at the chunk &ex: %x%&a, &ez: %z%&a.'
+  deletion-fail: '&cAn issue occurred whilst trying to delete the collector.'
   destroyed-collector: '&aYou destroyed a collector, all the contents were sold.'
+  collector-empty: '&cThere are no contents that can be sold in this collector.'
   contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%total%&a.'
 
 prices:

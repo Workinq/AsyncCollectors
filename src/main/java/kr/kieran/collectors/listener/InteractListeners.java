@@ -1,6 +1,7 @@
 package kr.kieran.collectors.listener;
 
 import kr.kieran.collectors.CollectorsPlugin;
+import kr.kieran.collectors.gui.CollectorGui;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Color;
 import org.bukkit.Material;
@@ -36,8 +37,9 @@ public class InteractListeners implements Listener
         long chunkId = block.getChunk().getChunkKey();
 
         // Check
+        if (player.isSneaking()) return;
+        if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        // TODO: Fix check to prevent cancelling placing regular blocks
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
             player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
@@ -52,7 +54,9 @@ public class InteractListeners implements Listener
         // Cancel
         event.setCancelled(true);
 
-        // TODO: Open the collector menu
+        // Open
+        CollectorGui gui = new CollectorGui(plugin, plugin.getConfig().getInt("collector.gui.rows"), Color.color(plugin.getConfig().getString("collector.gui.name")), 20L, collector);
+        gui.open(player);
     }
 
     // LISTENER: COLLECTOR SELL
@@ -70,8 +74,6 @@ public class InteractListeners implements Listener
         if (!player.isSneaking()) return;
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (!player.isSneaking()) return;
-        // TODO: Fix check to prevent cancelling placing regular blocks
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
             player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
