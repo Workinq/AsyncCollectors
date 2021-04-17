@@ -34,7 +34,6 @@ public class CollectorGui extends RefreshingGui
         {
             Material material = entry.getKey();
             int amount = entry.getValue();
-            if (amount == 0) continue;
 
             this.addItem(ItemBuilder.from(material).setLore(Color.color(List.of("&7Amount: &f" + amount))).asGuiItem(event -> {
                 event.setCancelled(true);

@@ -100,7 +100,6 @@ public class InteractListeners implements Listener
         {
             Material material = entry.getKey();
             int amount = entry.getValue();
-            if (amount <= 0) continue;
             if (!plugin.getConfig().isSet("prices." + material.name())) continue;
 
             double price = plugin.getConfig().getDouble("prices." + material.name());

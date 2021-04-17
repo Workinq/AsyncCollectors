@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 public class Collector
 {
@@ -23,7 +24,8 @@ public class Collector
 
     // CONTENTS
     private final Map<Material, Integer> contents;
-    public Map<Material, Integer> getContents() { return Collections.unmodifiableMap(contents); }
+    public Map<Material, Integer> getAbsoluteContents() { return Collections.unmodifiableMap(contents); }
+    public Map<Material, Integer> getContents() { return this.contents.entrySet().stream().filter(entry -> entry.getValue() != 0).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)); }
     public int getMaterialAmount(Material material) { return contents.getOrDefault(material, 0); }
     public void setMaterialAmount(Material material, int amount) { contents.put(material, amount); }
     public void clearContents() { contents.replaceAll((material, integer) -> integer = 0); }

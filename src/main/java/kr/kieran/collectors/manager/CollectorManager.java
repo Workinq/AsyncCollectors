@@ -264,7 +264,7 @@ public class CollectorManager
             statement.executeUpdate();
 
             // Contents
-            collector.getContents().forEach((material, integer) -> this.saveContents(connection, collector, material, integer));
+            collector.getAbsoluteContents().forEach((material, integer) -> this.saveContents(connection, collector, material, integer));
             consumer.accept(collector);
         }
         catch (SQLException e)
