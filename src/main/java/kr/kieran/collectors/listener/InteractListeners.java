@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Map;
 import java.util.UUID;
@@ -97,6 +98,7 @@ public class InteractListeners implements Listener
 
         // Check
         if (!player.isSneaking()) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (!plugin.getChunkManager().canUseChunk(chunkId))
