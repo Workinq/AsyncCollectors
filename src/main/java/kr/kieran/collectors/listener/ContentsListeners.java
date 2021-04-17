@@ -27,20 +27,22 @@ package kr.kieran.collectors.listener;
 
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.model.Collector;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.LootTables;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 public class ContentsListeners implements Listener
@@ -54,7 +56,7 @@ public class ContentsListeners implements Listener
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void creature(CreatureSpawnEvent event)
+    public void spawner(CreatureSpawnEvent event)
     {
         // Check the creature came from a spawner
         if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER) return;
@@ -86,6 +88,38 @@ public class ContentsListeners implements Listener
             Material material = drop.getType();
             collector.setMaterialAmount(material, collector.getMaterialAmount(material) + drop.getAmount());
         }
+
+        // Save
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().save(collector, after -> {}));
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void death(EntityDeathEvent event)
+    {
+        // Args
+        Entity entity = event.getEntity();
+        if (entity instanceof Player) return;
+        long chunkId = entity.getChunk().getChunkKey();
+
+        // If the chunk isn't tracked cancel the event
+        if (!plugin.getChunkManager().canUseChunk(chunkId))
+        {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Get the collector, if any, from the chunk
+        Collector collector = plugin.getCollectorManager().getById(chunkId);
+        if (collector == null) return;
+
+        // Add to the collector
+        List<ItemStack> drops = event.getDrops();
+        for (ItemStack drop : drops)
+        {
+            Material material = drop.getType();
+            collector.setMaterialAmount(material, collector.getMaterialAmount(material) + drop.getAmount());
+        }
+        event.getDrops().clear();
 
         // Save
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().save(collector, after -> {}));
