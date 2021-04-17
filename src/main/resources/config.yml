@@ -6,6 +6,7 @@ mysql:
   password: root
 
 collector:
+  sell-timeout: 20 # how long (in seconds) to wait for the data to be saved before discarding it
   item:
     material: BEACON
     data: 0

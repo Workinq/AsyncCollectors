@@ -13,11 +13,12 @@ public class MoneyManager
 {
 
     private final CollectorsPlugin plugin;
-    private final Cache<UUID, Double> owedMoney = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
+    private final Cache<UUID, Double> owedMoney;
 
     public MoneyManager(CollectorsPlugin plugin)
     {
         this.plugin = plugin;
+        this.owedMoney = CacheBuilder.newBuilder().expireAfterWrite(plugin.getConfig().getInt("collector.sell-timeout"), TimeUnit.SECONDS).build();
     }
 
     public void queueMoney(UUID uniqueId, double amount)
