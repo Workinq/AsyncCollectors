@@ -347,6 +347,25 @@ public class CollectorManager
         }
     }
 
+    public double sell(Collector collector)
+    {
+        // Calculate
+        double total = 0.0d;
+        for (Map.Entry<Material, Integer> entry : collector.getContents().entrySet())
+        {
+            Material material = entry.getKey();
+            int amount = entry.getValue();
+            if (!plugin.getConfig().isSet("prices." + material.name())) continue;
+
+            double price = plugin.getConfig().getDouble("prices." + material.name());
+            total += price * amount;
+        }
+
+        // Clear
+        collector.clearContents();
+        return total;
+    }
+
     /**
      * Clear the cache of all objects to prevent memory leaks.
      */
