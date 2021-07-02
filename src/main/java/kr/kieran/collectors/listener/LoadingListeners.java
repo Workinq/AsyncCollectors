@@ -47,7 +47,10 @@ public class LoadingListeners implements Listener
     public void chunkLoad(ChunkLoadEvent event)
     {
         long chunkId = event.getChunk().getChunkKey();
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().load(chunkId, collector -> plugin.getChunkManager().track(chunkId)));
+        plugin.newChain()
+                .async(() -> plugin.getCollectorManager().load(chunkId))
+                .sync(() -> plugin.getChunkManager().track(chunkId))
+                .execute();
     }
 
     // LISTENER: COLLECTOR UNLOAD
@@ -64,7 +67,10 @@ public class LoadingListeners implements Listener
         }
 
         // Save & unload
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().save(collector, after -> plugin.getCollectorManager().invalidate(chunkId)));
+        plugin.newChain()
+                .async(() -> plugin.getCollectorManager().save(collector))
+                .sync(() -> plugin.getCollectorManager().invalidate(chunkId))
+                .execute();
     }
 
 }

@@ -25,6 +25,9 @@
 
 package kr.kieran.collectors;
 
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
 import kr.kieran.collectors.command.CollectorCommand;
 import kr.kieran.collectors.database.Database;
 import kr.kieran.collectors.listener.ContentsListeners;
@@ -62,12 +65,19 @@ public class CollectorsPlugin extends JavaPlugin
     private MoneyManager moneyManager;
     public MoneyManager getMoneyManager() { return moneyManager; }
 
+    // TASK CHAIN
+    private TaskChainFactory taskChain;
+    public <T> TaskChain<T> newChain() { return taskChain.newChain(); }
+
     // OVERRIDE
     @Override public void onLoad() { this.saveDefaultConfig(); }
 
     @Override
     public void onEnable()
     {
+        // Task
+        this.taskChain = BukkitTaskChainFactory.create(this);
+
         // Economy
         this.setupEconomy();
 

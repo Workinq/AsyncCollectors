@@ -90,7 +90,9 @@ public class ContentsListeners implements Listener
         }
 
         // Save
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().save(collector, after -> {}));
+        plugin.newChain()
+                .async(() -> plugin.getCollectorManager().save(collector))
+                .execute();
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -122,7 +124,9 @@ public class ContentsListeners implements Listener
         event.getDrops().clear();
 
         // Save
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getCollectorManager().save(collector, after -> {}));
+        plugin.newChain()
+                .async(() -> plugin.getCollectorManager().save(collector))
+                .execute();
     }
 
 }

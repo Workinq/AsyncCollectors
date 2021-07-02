@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class CollectorManager
@@ -139,13 +138,12 @@ public class CollectorManager
 
     /**
      * Load a collector from the database using the chunk key as the
-     * primary key. If a record doesn't exist {@link CollectorManager#create(long, String, Consumer)}
+     * primary key. If a record doesn't exist {@link CollectorManager#create(long, String)}
      * will be called to insert a new one into the database.
      *
      * @param chunkId  the key for the chunk the collector is placed in
-     * @param consumer the consumer to operate on
      */
-    public void load(long chunkId, Consumer<Collector> consumer)
+    public Collector load(long chunkId)
     {
         try (
                 Connection connection = plugin.getDatabase().getConnection();
@@ -157,11 +155,7 @@ public class CollectorManager
 
             // Results
             ResultSet result = statement.executeQuery();
-            if (!result.next())
-            {
-                consumer.accept(null);
-                return;
-            }
+            if (!result.next()) return null;
 
             // Variables
             Collector.Mode mode = Collector.Mode.valueOf(result.getString("mode"));
@@ -190,16 +184,16 @@ public class CollectorManager
 
             // Cache
             this.cache.put(chunkId, collector);
-            consumer.accept(collector);
+            return collector;
         }
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "A sql exception occurred (load): " + e.getMessage());
-            consumer.accept(null);
+            return null;
         }
     }
 
-    public void create(long chunkId, String location, Consumer<Collector> consumer)
+    public Collector create(long chunkId, String location)
     {
         try (
                 Connection connection = plugin.getDatabase().getConnection();
@@ -218,12 +212,12 @@ public class CollectorManager
 
             // Save
             this.cache.put(chunkId, collector);
-            consumer.accept(collector);
+            return collector;
         }
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "A sql exception occurred (create): " + e.getMessage());
-            consumer.accept(null);
+            return null;
         }
     }
 
@@ -235,9 +229,8 @@ public class CollectorManager
      * case the object needs to be used elsewhere.
      *
      * @param collector the collector to be removed from the database
-     * @param consumer  the consumer to then operate on
      */
-    public void delete(Collector collector, Consumer<Collector> consumer)
+    public Collector delete(Collector collector)
     {
         try (
                 Connection connection = plugin.getDatabase().getConnection();
@@ -254,24 +247,21 @@ public class CollectorManager
             statement.executeUpdate();
 
             // Cache
-            this.cache.remove(chunkId);
-            consumer.accept(collector);
+            return this.cache.remove(chunkId);
         }
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "A sql exception occurred (delete): " + e.getMessage());
-            consumer.accept(null);
+            return null;
         }
     }
 
     /**
-     * Save a collector to the database and then use a consumer to run
-     * code once the save has completed.
+     * Save a collector to the database.
      *
      * @param collector the collector to save to the database
-     * @param consumer  once the collector is saved, accept the consumer
      */
-    public void save(Collector collector, Consumer<Collector> consumer)
+    public Collector save(Collector collector)
     {
         // Lock
         collector.lock();
@@ -290,12 +280,12 @@ public class CollectorManager
 
             // Contents
             collector.getAbsoluteContents().forEach((material, integer) -> this.saveContents(connection, collector, material, integer));
-            consumer.accept(collector);
+            return collector;
         }
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "A sql exception occurred (save): " + e.getMessage());
-            consumer.accept(null);
+            return null;
         }
         finally
         {

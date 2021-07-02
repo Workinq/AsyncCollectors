@@ -141,15 +141,16 @@ public class InteractListeners implements Listener
         plugin.getMoneyManager().queueMoney(uniqueId, finalTotal);
 
         // Save & Inform
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getCollectorManager().save(collector, after -> {
-                // Deposit
-                plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getMoneyManager().execute(uniqueId));
+        plugin.newChain()
+                .async(() -> plugin.getCollectorManager().save(collector))
+                .sync(() -> {
+                    // Deposit
+                    plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getMoneyManager().execute(uniqueId));
 
-                // Inform
-                player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.1f", finalTotal))));
-            });
-        });
+                    // Inform
+                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.1f", finalTotal))));
+                })
+                .execute();
     }
 
 }

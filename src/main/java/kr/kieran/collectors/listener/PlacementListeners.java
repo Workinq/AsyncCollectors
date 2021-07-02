@@ -86,22 +86,25 @@ public class PlacementListeners implements Listener
         plugin.getChunkManager().lock(chunkId);
 
         // Create & Unlock
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getCollectorManager().create(chunkId, SerializationUtil.serialize(location), after -> {
-                // Unlock
-                plugin.getChunkManager().unlock(chunkId);
+        plugin.newChain()
+                .asyncFirst(() -> plugin.getCollectorManager().create(chunkId, SerializationUtil.serialize(location)))
+                .abortIf(collector -> {
+                    // Check
+                    if (collector == null)
+                    {
+                        player.sendMessage(Color.color(plugin.getConfig().getString("messages.creation-fail")));
+                        return true;
+                    }
+                    return false;
+                })
+                .sync(() -> {
+                    // Unlock
+                    plugin.getChunkManager().unlock(chunkId);
 
-                // Check
-                if (after == null)
-                {
-                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.creation-fail")));
-                    return;
-                }
-
-                // Inform
-                player.sendMessage(Color.color(plugin.getConfig().getString("messages.placed-collector").replace("%x%", String.format("%,d", chunk.getX())).replace("%z%", String.format("%,d", chunk.getZ()))));
-            });
-        });
+                    // Inform
+                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.placed-collector").replace("%x%", String.format("%,d", chunk.getX())).replace("%z%", String.format("%,d", chunk.getZ()))));
+                })
+                .execute();
     }
 
     // LISTENER: COLLECTOR BREAK
@@ -131,22 +134,25 @@ public class PlacementListeners implements Listener
         plugin.getChunkManager().lock(chunkId);
 
         // Destroy & Unlock
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getCollectorManager().delete(collector, after -> {
-                // Unlock
-                plugin.getChunkManager().unlock(chunkId);
+        plugin.newChain()
+                .asyncFirst(() -> plugin.getCollectorManager().delete(collector))
+                .abortIf((toDelete) -> {
+                    // Check
+                    if (toDelete == null)
+                    {
+                        player.sendMessage(Color.color(plugin.getConfig().getString("messages.deletion-fail")));
+                        return true;
+                    }
+                    return false;
+                })
+                .sync(() -> {
+                    // Unlock
+                    plugin.getChunkManager().unlock(chunkId);
 
-                // Check
-                if (after == null)
-                {
-                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.deletion-fail")));
-                    return;
-                }
-
-                // Inform
-                player.sendMessage(Color.color(plugin.getConfig().getString("messages.destroyed-collector")));
-            });
-        });
+                    // Inform
+                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.destroyed-collector")));
+                })
+                .execute();
     }
 
 }
