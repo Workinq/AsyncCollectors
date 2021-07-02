@@ -30,6 +30,7 @@ import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Color;
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.Map;
 public class CollectorGui extends RefreshingGui
 {
 
+    private final CollectorsPlugin plugin;
     private final Collector collector;
 
     public CollectorGui(@NotNull CollectorsPlugin plugin, int rows, @NotNull String title, long period, @NotNull Collector collector)
@@ -46,6 +48,7 @@ public class CollectorGui extends RefreshingGui
         super(plugin, rows, title, period);
 
         // Assign
+        this.plugin = plugin;
         this.collector = collector;
 
         // Populate
@@ -61,7 +64,23 @@ public class CollectorGui extends RefreshingGui
             int amount = entry.getValue();
 
             this.addItem(ItemBuilder.from(material).setLore(Color.color(List.of("&7Amount: &f" + amount))).asGuiItem(event -> {
+                // Args
+                Player player = (Player) event.getWhoClicked();
+                double total = plugin.getCollectorManager().sell(collector, material);
+
+                // Check
+                if (total == -1.0d)
+                {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                // Cancel click
                 event.setCancelled(true);
+
+                // Deposit
+                plugin.getMoneyManager().pay(player.getUniqueId(), total);
+                player.sendMessage(Color.color(plugin.getConfig().getString("messages.material-sold").replace("%amount%", String.format("%,d", amount)).replace("%material%", material.name()).replace("%total%", String.format("%.1f", total))));
             }));
         }
     }
