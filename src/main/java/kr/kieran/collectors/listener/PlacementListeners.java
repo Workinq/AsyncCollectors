@@ -135,6 +135,10 @@ public class PlacementListeners implements Listener
 
         // Destroy & Unlock
         plugin.newChain()
+                .sync(() -> {
+                    double total = plugin.getCollectorManager().sell(collector);
+                    plugin.getMoneyManager().queueMoney(player.getUniqueId(), total);
+                })
                 .asyncFirst(() -> plugin.getCollectorManager().delete(collector))
                 .abortIf((toDelete) -> {
                     // Check
@@ -148,6 +152,9 @@ public class PlacementListeners implements Listener
                 .sync(() -> {
                     // Unlock
                     plugin.getChunkManager().unlock(chunkId);
+
+                    // Money
+                    plugin.getMoneyManager().execute(player.getUniqueId());
 
                     // Inform
                     player.sendMessage(Color.color(plugin.getConfig().getString("messages.destroyed-collector")));
