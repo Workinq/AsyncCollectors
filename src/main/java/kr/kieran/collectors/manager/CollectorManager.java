@@ -382,6 +382,26 @@ public class CollectorManager
     }
 
     /**
+     * Sell only a specific material from a collector
+     *
+     * @param collector the collector to sell the contents of
+     * @param material  the material to sell
+     * @return the total price after selling the material or -1 if it doesn't exist in the config
+     */
+    public double sell(Collector collector, Material material)
+    {
+        // Args
+        int amount = collector.getMaterialAmount(material);
+        if (amount == 0 || !plugin.getConfig().isSet("prices." + material.name())) return -1.0d;
+        double price = plugin.getConfig().getDouble("prices." + material.name());
+        double total = amount * price;
+
+        // Clear
+        collector.setMaterialAmount(material, 0);
+        return total;
+    }
+
+    /**
      * Clear the cache of all objects to prevent memory leaks.
      */
     public void disable()
