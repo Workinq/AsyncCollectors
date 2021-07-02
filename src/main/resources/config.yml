@@ -33,6 +33,7 @@ messages:
   destroyed-collector: '&aYou destroyed a collector, all the contents were sold.'
   collector-empty: '&cThere are no contents that can be sold in this collector.'
   contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%total%&a.'
+  material-sold: '&aSuccessfully sold &e%amount%x &aof &e%material% &afor &e$%total%&a.'
 
 prices:
   PORKCHOP: 10.0
