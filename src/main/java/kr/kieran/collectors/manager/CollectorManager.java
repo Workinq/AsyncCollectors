@@ -141,7 +141,8 @@ public class CollectorManager
      * primary key. If a record doesn't exist {@link CollectorManager#create(long, String)}
      * will be called to insert a new one into the database.
      *
-     * @param chunkId  the key for the chunk the collector is placed in
+     * @param chunkId the key for the chunk the collector is placed in
+     * @return the collector after being loaded
      */
     public Collector load(long chunkId)
     {
@@ -193,6 +194,13 @@ public class CollectorManager
         }
     }
 
+    /**
+     * Create a new collector at the given location
+     *
+     * @param chunkId  the generated chunk id
+     * @param location the serialised location of the collector
+     * @return the collector after being created
+     */
     public Collector create(long chunkId, String location)
     {
         try (
@@ -260,6 +268,7 @@ public class CollectorManager
      * Save a collector to the database.
      *
      * @param collector the collector to save to the database
+     * @return the collector after being saved
      */
     public Collector save(Collector collector)
     {
@@ -347,6 +356,12 @@ public class CollectorManager
         }
     }
 
+    /**
+     * Sell all the contents of a collector
+     *
+     * @param collector the collector to sell the contents of
+     * @return the total price after selling all the contents
+     */
     public double sell(Collector collector)
     {
         // Calculate
