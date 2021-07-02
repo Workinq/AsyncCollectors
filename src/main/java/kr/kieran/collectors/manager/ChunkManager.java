@@ -47,7 +47,7 @@ public class ChunkManager
      *
      * @param chunkId the id of the chunk to lock
      */
-    public void lock(long chunkId)
+    public synchronized void lock(long chunkId)
     {
         this.lockedChunks.add(chunkId);
     }
@@ -58,12 +58,9 @@ public class ChunkManager
      *
      * @param chunkId the id of the chunk to unlock
      */
-    public void unlock(long chunkId)
+    public synchronized void unlock(long chunkId)
     {
-        synchronized (this.lockedChunks)
-        {
-            this.lockedChunks.remove(chunkId);
-        }
+        this.lockedChunks.remove(chunkId);
     }
 
     /**
