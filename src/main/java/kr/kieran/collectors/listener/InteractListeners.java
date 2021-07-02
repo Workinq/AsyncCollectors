@@ -39,7 +39,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class InteractListeners implements Listener
@@ -121,34 +120,19 @@ public class InteractListeners implements Listener
         // Cancel
         event.setCancelled(true);
 
-        // Sell collector contents
-        double total = 0.0d, finalTotal;
-        for (Map.Entry<Material, Integer> entry : collector.getContents().entrySet())
-        {
-            Material material = entry.getKey();
-            int amount = entry.getValue();
-            if (!plugin.getConfig().isSet("prices." + material.name())) continue;
-
-            double price = plugin.getConfig().getDouble("prices." + material.name());
-            total += price * amount;
-        }
-        finalTotal = total;
-
-        // Clear
-        collector.clearContents();
-
         // Money
-        plugin.getMoneyManager().queueMoney(uniqueId, finalTotal);
+        double total = plugin.getCollectorManager().sell(collector);
+        plugin.getMoneyManager().queueMoney(uniqueId, total);
 
         // Save & Inform
         plugin.newChain()
                 .async(() -> plugin.getCollectorManager().save(collector))
                 .sync(() -> {
                     // Deposit
-                    plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getMoneyManager().execute(uniqueId));
+                    plugin.getMoneyManager().execute(uniqueId);
 
                     // Inform
-                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.1f", finalTotal))));
+                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.contents-sold").replace("%total%", String.format("%,.1f", total))));
                 })
                 .execute();
     }
