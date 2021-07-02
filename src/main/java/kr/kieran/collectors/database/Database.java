@@ -28,10 +28,15 @@ package kr.kieran.collectors.database;
 import com.zaxxer.hikari.HikariDataSource;
 import kr.kieran.collectors.CollectorsPlugin;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class Database
 {
@@ -43,7 +48,15 @@ public class Database
     {
         this.plugin = plugin;
         this.registerProperties();
-        this.setupTables();
+        try
+        {
+            this.setupTables();
+        }
+        catch (SQLException e)
+        {
+            plugin.getLogger().log(Level.INFO, "Failed to setup necessary tables for the plugin.");
+            plugin.getServer().getPluginManager().disablePlugin(plugin);
+        }
     }
 
     /**
@@ -79,28 +92,31 @@ public class Database
      * Setup the required tables synchronously to ensure they're
      * available before the plugin attempts to use them.
      */
-    private void setupTables()
+    private void setupTables() throws SQLException
     {
-        // Log
-        plugin.getLogger().log(Level.INFO, "Executing preliminary database queries...");
-
-        // Setup
-        try (
-                Connection connection = this.getConnection();
-                PreparedStatement collectors = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `collectors_collectors` (`collector_id` BIGINT NOT NULL, `mode` VARCHAR(9) NOT NULL DEFAULT 'ALL', `location` VARCHAR(255) NOT NULL, PRIMARY KEY (`collector_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-                PreparedStatement contents = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `collectors_contents` (`collector_id` BIGINT NOT NULL, `material` VARCHAR(255) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`collector_id`, `material`), FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
-        )
+        String setup;
+        try (InputStream in = CollectorsPlugin.class.getClassLoader().getResourceAsStream("dbtables.sql"))
         {
-            // Execute
-            collectors.executeUpdate();
-            contents.executeUpdate();
+            setup = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
         }
-        catch (SQLException e)
+        catch (IOException e)
         {
-            // Log
-            plugin.getLogger().log(Level.SEVERE, "A sql exception occurred: " + e.getMessage());
+            plugin.getLogger().log(Level.SEVERE, "Could not read from 'dbtables.sql': " + e.getMessage());
             plugin.getServer().getPluginManager().disablePlugin(plugin);
             return;
+        }
+
+        // Mariadb can only handle a single query per statement. We need to split at ;.
+        String[] queries = setup.split(";");
+        // execute each query to the database.
+        for (String query : queries)
+        {
+            // If you use the legacy way you have to check for empty queries here.
+            if (query.isBlank()) continue;
+            try (Connection connection = this.getConnection(); PreparedStatement statement = connection.prepareStatement(query))
+            {
+                statement.execute();
+            }
         }
 
         // Log
@@ -114,6 +130,7 @@ public class Database
      * @throws SQLException if something went wrong throw an exception
      */
     public Connection getConnection() throws SQLException { return this.dataSource.getConnection(); }
+
     public void disable() { this.dataSource.close(); }
 
 }
