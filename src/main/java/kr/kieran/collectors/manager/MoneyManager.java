@@ -68,6 +68,13 @@ public class MoneyManager
         this.owedMoney.invalidate(uniqueId);
     }
 
+    public void pay(UUID uniqueId, double amount)
+    {
+        OfflinePlayer player = plugin.getServer().getOfflinePlayer(uniqueId);
+        if (!player.hasPlayedBefore()) return;
+        plugin.getEconomy().depositPlayer(player, amount);
+    }
+
     // DISABLE
     public void disable()
     {
