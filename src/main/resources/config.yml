@@ -102,6 +102,8 @@ messages:
   collector-empty: '&cThere are no contents that can be sold in this collector.'
   contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%total%&a.'
   material-sold: '&aSuccessfully sold &e%amount%x &aof &e%material% &afor &e$%total%&a.'
+  cannot-sell-item: '&cYou cannot sell &e%item%&c.'
+  removing-collector: '&aPlease wait whilst this collector is cleared from the database.'
 
 prices:
   PORKCHOP: 10.0

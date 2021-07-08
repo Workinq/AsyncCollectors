@@ -69,7 +69,8 @@ public class PlacementListeners implements Listener
         if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Color.color(plugin.getConfig().getString("collector.item.name")))) return;
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
-            player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
+            String message = plugin.getConfig().getString("messages.chunk-locked");
+            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
             event.setCancelled(true);
             return;
         }
@@ -77,7 +78,8 @@ public class PlacementListeners implements Listener
         // Exists
         if (plugin.getCollectorManager().exists(chunkId))
         {
-            player.sendMessage(Color.color(plugin.getConfig().getString("messages.collector-exists")));
+            String message = plugin.getConfig().getString("messages.collector-exists");
+            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
             event.setCancelled(true);
             return;
         }
@@ -92,7 +94,8 @@ public class PlacementListeners implements Listener
                     // Check
                     if (collector == null)
                     {
-                        player.sendMessage(Color.color(plugin.getConfig().getString("messages.creation-fail")));
+                        String message = plugin.getConfig().getString("messages.creation-field");
+                        if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
                         return true;
                     }
                     return false;
@@ -102,7 +105,8 @@ public class PlacementListeners implements Listener
                     plugin.getChunkManager().unlock(chunkId);
 
                     // Inform
-                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.placed-collector").replace("%x%", String.format("%,d", chunk.getX())).replace("%z%", String.format("%,d", chunk.getZ()))));
+                    String message = plugin.getConfig().getString("messages.placed-collector");
+                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%x%", String.format("%,d", chunk.getX())).replace("%z%", String.format("%,d", chunk.getZ()))));
                 })
                 .execute();
     }
@@ -121,7 +125,8 @@ public class PlacementListeners implements Listener
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
-            player.sendMessage(Color.color(plugin.getConfig().getString("messages.chunk-locked")));
+            String message = plugin.getConfig().getString("messages.chunk-locked");
+            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
             event.setCancelled(true);
             return;
         }
@@ -130,21 +135,28 @@ public class PlacementListeners implements Listener
         Collector collector = plugin.getCollectorManager().getByLocation(location);
         if (collector == null) return;
 
-        // Lock
+        // Lock & Cancel
         plugin.getChunkManager().lock(chunkId);
+        event.setCancelled(true);
 
         // Destroy & Unlock
         plugin.newChain()
                 .sync(() -> {
+                    // Inform
+                    String message = plugin.getConfig().getString("messages.removing-collector");
+                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+
+                    // Pay
                     double total = plugin.getCollectorManager().sell(collector);
                     plugin.getMoneyManager().queueMoney(player.getUniqueId(), total);
                 })
                 .asyncFirst(() -> plugin.getCollectorManager().delete(collector))
-                .abortIf((toDelete) -> {
+                .abortIf(toDelete -> {
                     // Check
                     if (toDelete == null)
                     {
-                        player.sendMessage(Color.color(plugin.getConfig().getString("messages.deletion-fail")));
+                        String message = plugin.getConfig().getString("messages.deletion-fail");
+                        if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
                         return true;
                     }
                     return false;
@@ -157,11 +169,10 @@ public class PlacementListeners implements Listener
                     // Unlock
                     plugin.getChunkManager().unlock(chunkId);
 
-                    // Money
+                    // Deposit & Inform
                     plugin.getMoneyManager().execute(player.getUniqueId());
-
-                    // Inform
-                    player.sendMessage(Color.color(plugin.getConfig().getString("messages.destroyed-collector")));
+                    String message = plugin.getConfig().getString("messages.destroyed-collector");
+                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
                 })
                 .execute();
     }
