@@ -79,7 +79,12 @@ public class Collector
 
     public enum Mode
     {
-        WHITELIST, BLACKLIST, ALL
+        WHITELIST, BLACKLIST, ALL;
+
+        public Mode getNext()
+        {
+            return this == WHITELIST ? BLACKLIST : this == BLACKLIST ? ALL : WHITELIST;
+        }
     }
 
 }
