@@ -87,7 +87,7 @@
         <!-- MF-GUI -->
         <repository>
             <id>local-repo</id>
-            <url>file://${project.basedir}/repo</url>
+            <url></url>
         </repository>
         <!-- TaskChain -->
         <repository>
