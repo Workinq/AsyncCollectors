@@ -105,5 +105,35 @@ messages:
   cannot-sell-item: '&cYou cannot sell &e%item%&c.'
   removing-collector: '&aPlease wait whilst this collector is cleared from the database.'
 
+drops:
+  PIG:
+    material: PORKCHOP
+    range:
+      min: 1
+      max: 3
+  COW:
+    material: BEEF
+    range:
+      min: 1
+      max: 3
+  CHICKEN:
+    material: CHICKEN
+    range:
+      min: 1
+      max: 3
+  SHEEP:
+    material: MUTTON
+    range:
+      min: 1
+      max: 3
+
 prices:
   PORKCHOP: 10.0
+  FEATHER: 2.5
+  CHICKEN: 10.0
+  BEEF: 10.0
+  RABBIT_HIDE: 3.5
+  WHITE_WHOOL: 8.0
+  MUTTON: 10.0
+  RABBIT: 10.0
+  LEATHER: 3.5

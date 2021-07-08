@@ -23,71 +23,61 @@
  * SOFTWARE.
  */
 
-package kr.kieran.collectors.listener;
+package kr.kieran.collectors.listener.contents;
 
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.model.Collector;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
-import org.bukkit.loot.LootTables;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class ContentsListeners implements Listener
+public abstract class AbstractContentsListeners implements Listener
 {
 
-    private final CollectorsPlugin plugin;
+    public final CollectorsPlugin plugin;
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
-    public ContentsListeners(CollectorsPlugin plugin)
+    public AbstractContentsListeners(CollectorsPlugin plugin)
     {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void spawner(CreatureSpawnEvent event)
+    public void event(Cancellable cancellable, EntityType type, Location location)
     {
-        // Check the creature came from a spawner
-        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER) return;
-
         // Args
-        Entity entity = event.getEntity();
-        EntityType type = entity.getType();
-        long chunkId = entity.getChunk().getChunkKey();
+        long chunkId = location.getChunk().getChunkKey();
 
         // If the chunk isn't tracked cancel the event
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
-            event.setCancelled(true);
+            cancellable.setCancelled(true);
             return;
         }
 
         // Get the collector, if any, from the chunk
         Collector collector = plugin.getCollectorManager().getById(chunkId);
         if (collector == null) return;
-        event.setCancelled(true);
+        cancellable.setCancelled(true);
 
-        // Calculate the mob drops for the entity
-        LootTable lootTable = LootTables.valueOf(type.name()).getLootTable();
-        Collection<ItemStack> drops = lootTable.populateLoot(new Random(), new LootContext.Builder(entity.getLocation()).lootedEntity(entity).build());
+        // Calculate drop
+        String path = "drops." + type.name();
+        if (!plugin.getConfig().isSet(path)) return;
+        Material drop = Material.getMaterial(plugin.getConfig().getString(path + ".material"));
+        int amount = RANDOM.nextInt(plugin.getConfig().getInt(path + ".range.min"), plugin.getConfig().getInt(path + ".range.max"));
 
-        // Add to the collector
-        for (ItemStack drop : drops)
-        {
-            Material material = drop.getType();
-            collector.setMaterialAmount(material, collector.getMaterialAmount(material) + drop.getAmount());
-        }
+        // Add to collector
+        collector.setMaterialAmount(drop, collector.getMaterialAmount(drop) + amount);
 
         // Save
         plugin.newChain()
