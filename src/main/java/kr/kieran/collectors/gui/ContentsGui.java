@@ -67,31 +67,83 @@ public class ContentsGui extends RefreshScrollGui
     @Override
     public void populateGui()
     {
+        // Filler
+        this.getFiller();
+
+        // Items
         for (Map.Entry<Material, Integer> entry : collector.getContents().entrySet())
         {
+            // Args
             Material material = entry.getKey();
-            int amount = entry.getValue();
+            int startAmount = entry.getValue();
+            double startValue = plugin.getCollectorManager().value(collector, material);
+            List<String> lore = Color.color(plugin.getConfig().getStringList("guis.contents.item.lore").stream().map(text -> text.replace("%amount%", String.format("%,d", startAmount)).replace("%value%", String.format("%,.1f", startValue))).collect(Collectors.toList()));
+            List<Component> components = lore.stream().map(Component::text).collect(Collectors.toList());
 
-            this.addItem(ItemBuilder.from(material).setLore(Color.color(List.of("&7Amount: &f" + amount))).asGuiItem(event -> {
+            // Add
+            this.addItem(ItemBuilder.from(material).name(Component.text(this.getNicedEnumString(material.name()))).lore(components).asGuiItem(event ->
+            {
+                // Cancel
+                event.setCancelled(true);
+
                 // Args
                 Player player = (Player) event.getWhoClicked();
+                int amount = collector.getMaterialAmount(material);
                 double total = plugin.getCollectorManager().sell(collector, material);
 
                 // Check
-                if (total == -1.0d)
+                if (total == 0.0d)
                 {
-                    event.setCancelled(true);
+                    // TODO: Make it so collectors don't pick up items which can't be sold
                     return;
                 }
 
-                // Cancel click
-                event.setCancelled(true);
-
-                // Deposit
+                // Deposit & Inform
                 plugin.getMoneyManager().pay(player.getUniqueId(), total);
-                player.sendMessage(Color.color(plugin.getConfig().getString("messages.material-sold").replace("%amount%", String.format("%,d", amount)).replace("%material%", material.name()).replace("%total%", String.format("%.1f", total))));
+                String message = plugin.getConfig().getString("messages.material-sold");
+                if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%amount%", String.format("%,d", amount)).replace("%material%", this.getNicedEnumString(material.name())).replace("%total%", String.format("%.1f", total))));
+
+                // Update
+                this.update();
             }));
         }
+
+        // Navigation
+        this.setItem(3, 3, ItemBuilder.from(Material.ARROW).name(Component.text(Color.color("Previous"))).asGuiItem(event -> this.previous()));
+        this.setItem(3, 7, ItemBuilder.from(Material.ARROW).name(Component.text(Color.color("Next"))).asGuiItem(event -> this.next()));
+    }
+
+    private String implode(Object[] list)
+    {
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < list.length; i++)
+        {
+            Object item = list[i];
+            String str = (item == null ? "NULL" : item.toString());
+
+            if (i != 0) ret.append(" ");
+            ret.append(str);
+        }
+        return ret.toString();
+    }
+
+    private static final Pattern PATTERN_ENUM_SPLIT = Pattern.compile("[\\s_]+");
+    private String getNicedEnumString(String name)
+    {
+        List<String> parts = new ArrayList<>();
+        for (String part : PATTERN_ENUM_SPLIT.split(name.toLowerCase()))
+        {
+            parts.add(part.substring(0, 1).toUpperCase() + part.substring(1));
+        }
+        return ChatColor.WHITE + this.implode(parts.toArray(new Object[0]));
+    }
+
+    @Override
+    public @NotNull GuiFiller getFiller()
+    {
+        GuiFiller filler = super.getFiller();
+        filler.fillBorder(ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.space()).asGuiItem());
+        return filler;
     }
 
 }
