@@ -23,11 +23,25 @@
  * SOFTWARE.
  */
 
-package kr.kieran.collectors.gui.type;
+package kr.kieran.collectors.listener.contents;
 
-public interface RefreshGui
+import kr.kieran.collectors.CollectorsPlugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+
+public class DefaultContentsListener extends AbstractContentsListeners
 {
 
-    void populateGui();
+    public DefaultContentsListener(CollectorsPlugin plugin)
+    {
+        super(plugin);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void spawner(SpawnerSpawnEvent event)
+    {
+        this.event(event, event.getEntityType(), event.getLocation());
+    }
 
 }

@@ -31,10 +31,11 @@ import co.aikar.taskchain.TaskChainFactory;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import kr.kieran.collectors.command.CollectorCommand;
 import kr.kieran.collectors.database.Database;
-import kr.kieran.collectors.listener.ContentsListeners;
 import kr.kieran.collectors.listener.InteractListeners;
 import kr.kieran.collectors.listener.LoadingListeners;
 import kr.kieran.collectors.listener.PlacementListeners;
+import kr.kieran.collectors.listener.contents.DefaultContentsListener;
+import kr.kieran.collectors.listener.contents.OptimisedContentsListener;
 import kr.kieran.collectors.manager.ChunkManager;
 import kr.kieran.collectors.manager.CollectorManager;
 import kr.kieran.collectors.manager.MoneyManager;
@@ -124,7 +125,15 @@ public class CollectorsPlugin extends JavaPlugin
         this.getServer().getPluginManager().registerEvents(new LoadingListeners(this), this);
         this.getServer().getPluginManager().registerEvents(new PlacementListeners(this), this);
         this.getServer().getPluginManager().registerEvents(new InteractListeners(this), this);
-        this.getServer().getPluginManager().registerEvents(new ContentsListeners(this), this);
+        try
+        {
+            Class.forName("com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent");
+            this.getServer().getPluginManager().registerEvents(new OptimisedContentsListener(this), this);
+        }
+        catch (ClassNotFoundException e)
+        {
+            this.getServer().getPluginManager().registerEvents(new DefaultContentsListener(this), this);
+        }
     }
 
     // ECONOMY
