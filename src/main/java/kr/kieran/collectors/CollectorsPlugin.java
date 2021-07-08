@@ -28,6 +28,7 @@ package kr.kieran.collectors;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
 import kr.kieran.collectors.command.CollectorCommand;
 import kr.kieran.collectors.database.Database;
 import kr.kieran.collectors.listener.ContentsListeners;
@@ -37,9 +38,15 @@ import kr.kieran.collectors.listener.PlacementListeners;
 import kr.kieran.collectors.manager.ChunkManager;
 import kr.kieran.collectors.manager.CollectorManager;
 import kr.kieran.collectors.manager.MoneyManager;
+import kr.kieran.collectors.util.Color;
+import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.stream.Collectors;
 
 public class CollectorsPlugin extends JavaPlugin
 {
@@ -129,6 +136,11 @@ public class CollectorsPlugin extends JavaPlugin
         RegisteredServiceProvider<Economy> provider = this.getServer().getServicesManager().getRegistration(Economy.class);
         if (provider == null) return;
         this.economy = provider.getProvider();
+    }
+
+    public ItemStack getCollector(int amount)
+    {
+        return ItemBuilder.from(Material.getMaterial(this.getConfig().getString("collector.item.material"))).name(Component.text(Color.color(this.getConfig().getString("collector.item.name")))).lore(Color.color(this.getConfig().getStringList("collector.item.lore")).stream().map(Component::text).collect(Collectors.toList())).amount(amount).build();
     }
 
 }

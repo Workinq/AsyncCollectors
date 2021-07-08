@@ -77,7 +77,7 @@ public class CollectorCommand implements CommandExecutor
         }
 
         // Give
-        ItemStack collector = new ItemBuilder(Material.getMaterial(plugin.getConfig().getString("collector.item.material"))).durability(plugin.getConfig().getInt("collector.item.data")).name(Color.color(plugin.getConfig().getString("collector.item.name"))).setLores(Color.color(plugin.getConfig().getStringList("collector.item.lore"))).amount(amount);
+        ItemStack collector = plugin.getCollector(amount);
         if (target.getInventory().firstEmpty() == -1)
         {
             target.getWorld().dropItemNaturally(target.getLocation(), collector);

@@ -150,6 +150,10 @@ public class PlacementListeners implements Listener
                     return false;
                 })
                 .sync(() -> {
+                    // Set & Drop
+                    location.getBlock().setType(Material.AIR);
+                    location.getWorld().dropItemNaturally(location, plugin.getCollector(1));
+
                     // Unlock
                     plugin.getChunkManager().unlock(chunkId);
 
