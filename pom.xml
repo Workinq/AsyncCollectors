@@ -86,8 +86,8 @@
         </repository>
         <!-- MF-GUI -->
         <repository>
-            <id>repo</id>
-            <url>https://repo.mattstudios.me/artifactory/public/</url>
+            <id>local-repo</id>
+            <url>file://${project.basedir}/repo</url>
         </repository>
         <!-- TaskChain -->
         <repository>
