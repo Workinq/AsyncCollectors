@@ -25,27 +25,36 @@
 
 package kr.kieran.collectors.gui;
 
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.components.InteractionModifier;
+import dev.triumphteam.gui.components.ScrollType;
+import dev.triumphteam.gui.components.util.GuiFiller;
 import kr.kieran.collectors.CollectorsPlugin;
+import kr.kieran.collectors.gui.type.RefreshScrollGui;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Color;
-import me.mattstudios.mfgui.gui.components.util.ItemBuilder;
+import net.kyori.adventure.text.Component;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class CollectorGui extends RefreshingGui
+public class ContentsGui extends RefreshScrollGui
 {
 
     private final CollectorsPlugin plugin;
     private final Collector collector;
 
-    public CollectorGui(@NotNull CollectorsPlugin plugin, int rows, @NotNull String title, long period, @NotNull Collector collector)
+    public ContentsGui(@NotNull CollectorsPlugin plugin, int rows, long period, @NotNull Collector collector)
     {
         // Super
-        super(plugin, rows, title, period);
+        super(plugin, rows, 7, Color.color(plugin.getConfig().getString("guis.contents.name")), ScrollType.VERTICAL, period, InteractionModifier.VALUES);
 
         // Assign
         this.plugin = plugin;

@@ -9,14 +9,82 @@ collector:
   sell-timeout: 20 # how long (in seconds) to wait for the data to be saved before discarding it
   item:
     material: BEACON
-    data: 0
     name: '&c&lCollector'
     lore:
       - '&7Place this collector to automatically collect'
       - '&7all mob drops and crops in a chunk.'
-  gui:
-    name: '&c&lCollector Menu'
-    rows: 6 # 54 slots in total
+
+guis:
+  menu:
+    name: '&cCollector - Menu'
+    rows: 3
+    items:
+      contents:
+        material: GRASS_BLOCK
+        name: '&fContents'
+        slot: 11
+        action: CONTENTS
+      settings:
+        material: CLOCK
+        name: '&fSettings'
+        slot: 15
+        action: SETTINGS
+  contents:
+    name: '&cCollector - Contents'
+    variable-rows: true # if true, rows will be adjusted depending on amount of items
+    rows: 5 # 45 slots in total
+    item:
+      lore:
+        - '&7Amount: &f%amount%'
+        - '&7Value: &f$%value%'
+        - ''
+        - '&7Left-click to sell item'
+  settings:
+    name: '&cCollector - Settings'
+    rows: 3
+    items:
+      mode:
+        slot: 11
+        name: '&fCollector Mode'
+        action: MODE
+        whitelist:
+          material: WHITE_WOOL
+          lore:
+            - '&7Mode: &fWhitelist'
+            - ''
+            - '&fWhitelist &7mode only allows materials'
+            - '&7which are whitelisted. To edit the'
+            - '&7whitelisted materials head to settings'
+            - '&7and click on the &fEdit Blocks &7button.'
+            - ''
+            - '&7Left-click to switch to &fBlacklist &7mode'
+        blacklist:
+          material: BLACK_WOOL
+          name: '&fCollector Mode'
+          lore:
+            - '&7Mode: &fBlacklist'
+            - ''
+            - '&fBlacklist &7mode allows all materials except'
+            - '&7ones which are blacklisted. To edit the'
+            - '&7blacklisted materials head to settings'
+            - '&7and click on the &fEdit Blocks &7button.'
+            - ''
+            - '&7Left-click to switch to &fAll &7mode'
+        all:
+          material: GLASS
+          name: '&fCollector Mode'
+          lore:
+            - '&7Mode: &fAll'
+            - ''
+            - '&fAll &7mode allows all materials to be'
+            - '&7collected.'
+            - ''
+            - '&7Left-click to switch to &fWhitelist &7mode'
+      editor:
+        slot: 13
+        material: STONE
+        name: '&fEdit Blocks'
+        action: BLOCK_EDIT
 
 messages:
   no-permission: '&cYou do not have permission to use this command.'

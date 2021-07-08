@@ -23,14 +23,17 @@
  * SOFTWARE.
  */
 
-package kr.kieran.collectors.gui;
+package kr.kieran.collectors.gui.type;
 
+import dev.triumphteam.gui.components.InteractionModifier;
+import dev.triumphteam.gui.guis.BaseGui;
 import kr.kieran.collectors.CollectorsPlugin;
-import me.mattstudios.mfgui.gui.guis.BaseGui;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class RefreshingGui extends BaseGui
+import java.util.Set;
+
+public abstract class RefreshGui extends BaseGui
 {
 
     /**
@@ -44,15 +47,15 @@ public abstract class RefreshingGui extends BaseGui
      * update the inventory periodically using the parameter {@code period}
      * as the interval.
      *
-     * @param plugin    the collectors plugin instance
-     * @param rows      the number of rows to utilise
-     * @param title     the title of the gui
-     * @param period    the delay between gui updates
+     * @param plugin the collectors plugin instance
+     * @param rows   the number of rows to utilise
+     * @param title  the title of the gui
+     * @param period the delay between gui updates
      */
-    public RefreshingGui(@NotNull CollectorsPlugin plugin, int rows, @NotNull String title, long period)
+    public RefreshGui(@NotNull CollectorsPlugin plugin, int rows, @NotNull String title, long period, Set<InteractionModifier> modifiers)
     {
         // Super
-        super(rows, title);
+        super(rows, title, modifiers);
 
         // Start the update task
         this.taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this::update, period, period).getTaskId();
