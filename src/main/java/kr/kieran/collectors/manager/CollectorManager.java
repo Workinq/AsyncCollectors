@@ -365,16 +365,7 @@ public class CollectorManager
     public double sell(Collector collector)
     {
         // Calculate
-        double total = 0.0d;
-        for (Map.Entry<Material, Integer> entry : collector.getContents().entrySet())
-        {
-            Material material = entry.getKey();
-            int amount = entry.getValue();
-            if (!plugin.getConfig().isSet("prices." + material.name())) continue;
-
-            double price = plugin.getConfig().getDouble("prices." + material.name());
-            total += price * amount;
-        }
+        double total = this.value(collector);
 
         // Clear
         collector.clearContents();
@@ -382,7 +373,7 @@ public class CollectorManager
     }
 
     /**
-     * Sell only a specific material from a collector
+     * Sell only a specific material from a collector.
      *
      * @param collector the collector to sell the contents of
      * @param material  the material to sell
@@ -391,14 +382,45 @@ public class CollectorManager
     public double sell(Collector collector, Material material)
     {
         // Args
-        int amount = collector.getMaterialAmount(material);
-        if (amount == 0 || !plugin.getConfig().isSet("prices." + material.name())) return -1.0d;
-        double price = plugin.getConfig().getDouble("prices." + material.name());
-        double total = amount * price;
+        double total = this.value(collector, material);
 
         // Clear
         collector.setMaterialAmount(material, 0);
         return total;
+    }
+
+    /**
+     * Calculate the total value for an entire collector.
+     *
+     * @param collector the collector to calculate the value of
+     * @return the total value of the collector
+     */
+    public double value(Collector collector)
+    {
+        // Calculate
+        double total = 0.0d;
+        for (Map.Entry<Material, Integer> entry : collector.getContents().entrySet())
+        {
+            Material material = entry.getKey();
+            total += this.value(collector, material);
+        }
+        return total;
+    }
+
+    /**
+     * Calculate the total value for a specific material inside a collector.
+     *
+     * @param collector the collector to calculate the value of
+     * @param material  the material to calculate the value of
+     * @return the total value of the material in the collector
+     */
+    public double value(Collector collector, Material material)
+    {
+        // Args
+        int amount = collector.getMaterialAmount(material);
+        if (amount == 0 || !plugin.getConfig().isSet("prices." + material.name())) return 0.0d;
+        double price = plugin.getConfig().getDouble("prices." + material.name());
+        return amount * price;
     }
 
     /**
