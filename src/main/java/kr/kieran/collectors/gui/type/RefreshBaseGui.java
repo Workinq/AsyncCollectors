@@ -26,15 +26,14 @@
 package kr.kieran.collectors.gui.type;
 
 import dev.triumphteam.gui.components.InteractionModifier;
-import dev.triumphteam.gui.components.ScrollType;
-import dev.triumphteam.gui.guis.ScrollingGui;
+import dev.triumphteam.gui.guis.BaseGui;
 import kr.kieran.collectors.CollectorsPlugin;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public abstract class RefreshScrollGui extends ScrollingGui implements RefreshGui
+public abstract class RefreshBaseGui extends BaseGui implements RefreshGui
 {
 
     /**
@@ -43,9 +42,20 @@ public abstract class RefreshScrollGui extends ScrollingGui implements RefreshGu
      */
     private final int taskId;
 
-    public RefreshScrollGui(@NotNull CollectorsPlugin plugin, int rows, int pageSize, @NotNull String title, @NotNull ScrollType scrollType, long period, @NotNull Set<InteractionModifier> interactionModifiers)
+    /**
+     * Create a gui extending the {@link BaseGui} class which will
+     * update the inventory periodically using the parameter {@code period}
+     * as the interval.
+     *
+     * @param plugin the collectors plugin instance
+     * @param rows   the number of rows to utilise
+     * @param title  the title of the gui
+     * @param period the delay between gui updates
+     */
+    public RefreshBaseGui(@NotNull CollectorsPlugin plugin, int rows, @NotNull String title, long period, Set<InteractionModifier> modifiers)
     {
-        super(rows, pageSize, title, scrollType, interactionModifiers);
+        // Super
+        super(rows, title, modifiers);
 
         // Start the update task
         this.taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this::update, period, period).getTaskId();
@@ -61,8 +71,7 @@ public abstract class RefreshScrollGui extends ScrollingGui implements RefreshGu
         this.setUpdating(true);
 
         // Clear the gui items & repopulate using populateGui()
-        this.getPageItems().clear();
-        this.getCurrentPageItems().clear();
+        this.getGuiItems().clear();
         this.populateGui();
 
         // Super

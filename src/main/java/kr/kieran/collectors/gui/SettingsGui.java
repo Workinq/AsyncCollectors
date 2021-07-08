@@ -30,7 +30,7 @@ import dev.triumphteam.gui.components.InteractionModifier;
 import dev.triumphteam.gui.components.util.GuiFiller;
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.action.SettingsAction;
-import kr.kieran.collectors.gui.type.RefreshGui;
+import kr.kieran.collectors.gui.type.RefreshBaseGui;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Color;
 import net.kyori.adventure.text.Component;
@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SettingsGui extends RefreshGui
+public class SettingsGui extends RefreshBaseGui
 {
 
     private final CollectorsPlugin plugin;
