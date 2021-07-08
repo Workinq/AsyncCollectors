@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public abstract class RefreshBaseGui extends BaseGui implements RefreshGui
+public abstract class RefreshBaseGui extends BaseGui
 {
 
     /**
@@ -80,5 +80,7 @@ public abstract class RefreshBaseGui extends BaseGui implements RefreshGui
         // Mark as no longer updating
         this.setUpdating(false);
     }
+
+    public abstract void populateGui();
 
 }

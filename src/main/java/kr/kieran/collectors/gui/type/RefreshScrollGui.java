@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public abstract class RefreshScrollGui extends ScrollingGui implements RefreshGui
+public abstract class RefreshScrollGui extends ScrollingGui
 {
 
     /**
@@ -71,5 +71,7 @@ public abstract class RefreshScrollGui extends ScrollingGui implements RefreshGu
         // Mark as no longer updating
         this.setUpdating(false);
     }
+
+    public abstract void populateGui();
 
 }
