@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>dev.triumphteam</groupId>
+  <artifactId>triumph-gui</artifactId>
+  <version>3.1.3-COLLFIX</version>
+  <name>Triumph GUI</name>
+  <description>Library for easy creation of GUIs for Bukkit plugins.</description>
+  <url>https://github.com/TriumphTeam/triumph-gui</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>matt</id>
+      <name>Mateus Moreira</name>
+      <organization>TriumphTeam</organization>
+      <organizationUrl>https://github.com/TriumphTeam</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/TriumphTeam/triumph-gui.git</connection>
+    <developerConnection>scm:git:ssh://github.com:TriumphTeam/triumph-gui.git</developerConnection>
+    <url>https://github.com/TriumphTeam/triumph-gui</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-api</artifactId>
+      <version>4.11.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-text-serializer-legacy</artifactId>
+      <version>4.11.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-text-serializer-gson</artifactId>
+      <version>4.11.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
