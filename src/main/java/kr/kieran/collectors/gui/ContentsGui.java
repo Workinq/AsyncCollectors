@@ -101,7 +101,7 @@ public class ContentsGui extends RefreshScrollGui
                 // Deposit & Inform
                 plugin.getMoneyManager().pay(player.getUniqueId(), total);
                 String message = plugin.getConfig().getString("messages.material-sold");
-                if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%amount%", String.format("%,d", amount)).replace("%material%", this.getNicedEnumString(material.name())).replace("%total%", String.format("%.1f", total))));
+                if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%amount%", String.format("%,d", amount)).replace("%material%", this.getNicedEnumString(material.name())).replace("%total%", String.format("%,.1f", total))));
 
                 // Update
                 this.update();
