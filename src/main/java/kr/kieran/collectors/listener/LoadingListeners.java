@@ -47,9 +47,13 @@ public class LoadingListeners implements Listener
     public void chunkLoad(ChunkLoadEvent event)
     {
         long chunkId = event.getChunk().getChunkKey();
+        plugin.getChunkManager().lock(chunkId);
+
+        // TODO: Maybe use try/finally to always unlock the chunk in case of an error from loading the collector
+
         plugin.newChain()
                 .async(() -> plugin.getCollectorManager().load(chunkId))
-                .sync(() -> plugin.getChunkManager().track(chunkId))
+                .sync(() -> this.loadChunk(chunkId))
                 .execute();
     }
 
@@ -59,18 +63,31 @@ public class LoadingListeners implements Listener
     {
         // Args
         long chunkId = event.getChunk().getChunkKey();
+        plugin.getChunkManager().lock(chunkId);
+
         Collector collector = plugin.getCollectorManager().getById(chunkId);
         if (collector == null)
         {
-            plugin.getCollectorManager().invalidate(chunkId);
+            this.unloadChunk(chunkId);
             return;
         }
 
         // Save & unload
-        plugin.newChain()
-                .async(() -> plugin.getCollectorManager().save(collector))
-                .sync(() -> plugin.getCollectorManager().invalidate(chunkId))
-                .execute();
+        plugin.getSaveTask().queueSave(chunkId);
+        this.unloadChunk(chunkId);
+    }
+
+    private void loadChunk(long chunkId)
+    {
+        plugin.getChunkManager().track(chunkId);
+        plugin.getChunkManager().unlock(chunkId);
+    }
+
+    private void unloadChunk(long chunkId)
+    {
+        plugin.getCollectorManager().invalidate(chunkId);
+        plugin.getChunkManager().untrack(chunkId);
+        plugin.getChunkManager().unlock(chunkId);
     }
 
 }

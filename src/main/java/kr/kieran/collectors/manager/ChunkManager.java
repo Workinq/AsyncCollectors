@@ -25,7 +25,6 @@
 
 package kr.kieran.collectors.manager;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +33,7 @@ public class ChunkManager
 
     // CACHE
     private final Set<Long> trackedChunks = ConcurrentHashMap.newKeySet();  // TRACKED CHUNKS
-    private final Set<Long> lockedChunks = new HashSet<>();                 // LOCKED CHUNKS
+    private final Set<Long> lockedChunks = ConcurrentHashMap.newKeySet();   // LOCKED CHUNKS
 
     // --------------------- //
     // LOCKED CHUNKS         //
@@ -47,7 +46,7 @@ public class ChunkManager
      *
      * @param chunkId the id of the chunk to lock
      */
-    public synchronized void lock(long chunkId)
+    public void lock(long chunkId)
     {
         lockedChunks.add(chunkId);
     }
@@ -58,13 +57,13 @@ public class ChunkManager
      *
      * @param chunkId the id of the chunk to unlock
      */
-    public synchronized void unlock(long chunkId)
+    public void unlock(long chunkId)
     {
         lockedChunks.remove(chunkId);
     }
 
     /**
-     * Check if there if the chunk is locked by looking up the
+     * Check if the chunk is locked by looking up the
      * chunk id in the set containing the locked chunks.
      *
      * @param chunkId the id of the chunk to lookup
@@ -126,9 +125,9 @@ public class ChunkManager
      * @param chunkId the id of the chunk to check
      * @return true if the chunk can be modified and false otherwise
      */
-    public boolean canUseChunk(long chunkId)
+    public boolean isChunkBusy(long chunkId)
     {
-        return this.isTracked(chunkId) && !this.isLocked(chunkId);
+        return this.isLocked(chunkId) || !this.isTracked(chunkId);
     }
 
     /**

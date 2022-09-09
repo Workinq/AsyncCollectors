@@ -40,9 +40,8 @@ public class Collector
     private final ReentrantLock lock = new ReentrantLock(true);
     public void lock() { lock.lock(); }
     public void unlock() { lock.unlock(); }
-    public boolean isLocked() { return lock.isLocked(); }
 
-    // ID: CHUNK KEY
+    // ID
     private final long chunkId;
     public long getChunkId() { return chunkId; }
 
@@ -52,7 +51,7 @@ public class Collector
     public Map<Material, Integer> getContents() { return this.contents.entrySet().stream().filter(entry -> entry.getValue() != 0).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)); }
     public int getMaterialAmount(Material material) { return contents.getOrDefault(material, 0); }
     public void setMaterialAmount(Material material, int amount) { contents.put(material, amount); }
-    public void clearContents() { contents.replaceAll((material, integer) -> integer = 0); }
+    public void clearContents() { contents.replaceAll((material, integer) -> 0); }
     public boolean isEmpty()
     {
         if (contents.isEmpty()) return true;
@@ -78,9 +77,21 @@ public class Collector
 
     public enum Mode
     {
-        WHITELIST, BLACKLIST, ALL;
+        WHITELIST("whitelist"),
+        BLACKLIST("blacklist"),
+        ALL("all"),
 
-        public Mode getNext()
+        ;
+
+        private final String pathName;
+        public String getPathName() { return pathName; }
+
+        Mode(String pathName)
+        {
+            this.pathName = pathName;
+        }
+
+        public Mode nextMode()
         {
             return this == WHITELIST ? BLACKLIST : this == BLACKLIST ? ALL : WHITELIST;
         }

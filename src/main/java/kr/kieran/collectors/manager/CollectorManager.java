@@ -243,18 +243,15 @@ public class CollectorManager
      * to prevent any memory leaks as this method will not remove it in
      * case the object needs to be used elsewhere.
      *
-     * @param collector the collector to be removed from the database
+     * @param chunkId the chunkId of the collector to be removed from the database
      */
-    public Collector delete(Collector collector)
+    public Collector delete(long chunkId)
     {
         try (
                 Connection connection = plugin.getDatabase().getConnection();
                 PreparedStatement statement = connection.prepareStatement("DELETE FROM `collectors_collectors` WHERE `collector_id` = ?;")
         )
         {
-            // Args
-            long chunkId = collector.getChunkId();
-
             // Set
             statement.setLong(1, chunkId);
 
@@ -274,12 +271,27 @@ public class CollectorManager
     /**
      * Save a collector to the database.
      *
-     * @param collector the collector to save to the database
+     * @param chunkId the chunkId of the collector to save to the database
      * @return the collector after being saved
      */
-    public Collector save(Collector collector)
+    public Collector save(long chunkId)
     {
-        // Lock
+        return this.save(chunkId, true);
+    }
+
+    /**
+     * Save a collector to the database and, if {@code saveContents} is set to {@code true}
+     * save its contents too.
+     *
+     * @param chunkId the chunkId of the collector to save to the database
+     * @param saveContents whether to save the collector's contents to the database
+     * @return the collector after being saved
+     */
+    public Collector save(long chunkId, boolean saveContents)
+    {
+        // Fetch & lock
+        Collector collector = cache.get(chunkId);
+        if (collector == null) throw new RuntimeException("Collector at '" + chunkId + "' is null");
         collector.lock();
 
         try (
@@ -289,13 +301,18 @@ public class CollectorManager
         {
             // Set
             statement.setString(1, collector.getMode().name());
-            statement.setLong(2, collector.getChunkId());
+            statement.setLong(2, chunkId);
 
             // Update
             statement.executeUpdate();
 
             // Contents
-            collector.getAbsoluteContents().forEach((material, integer) -> this.saveContents(connection, collector, material, integer));
+            if (saveContents)
+            {
+                // TODO: Find a way to execute contents update as batch statement
+                collector.getAbsoluteContents().forEach((material, integer) -> this.saveContents(connection, chunkId, material, integer));
+            }
+
             return collector;
         }
         catch (SQLException e)
@@ -317,11 +334,11 @@ public class CollectorManager
      * will then insert a new one.
      *
      * @param connection a connection to not open an unnecessary amount
-     * @param collector  the collector to save the contents of
+     * @param chunkId  the chunkId of the collector to save the contents of
      * @param material   the material to delete or save
      * @param amount     the amount of the material
      */
-    public void saveContents(Connection connection, Collector collector, Material material, int amount)
+    public void saveContents(Connection connection, long chunkId, Material material, int amount)
     {
         boolean delete = amount <= 0;
         if (delete)
@@ -331,7 +348,7 @@ public class CollectorManager
             )
             {
                 // Set
-                statement.setLong(1, collector.getChunkId());
+                statement.setLong(1, chunkId);
                 statement.setString(2, material.name());
 
                 // Update
@@ -349,7 +366,7 @@ public class CollectorManager
             )
             {
                 // Set
-                statement.setLong(1, collector.getChunkId());
+                statement.setLong(1, chunkId);
                 statement.setInt(2, amount);
                 statement.setString(3, material.name());
 

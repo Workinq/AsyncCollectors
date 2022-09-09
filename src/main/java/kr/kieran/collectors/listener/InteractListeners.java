@@ -28,7 +28,7 @@ package kr.kieran.collectors.listener;
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.gui.MenuGui;
 import kr.kieran.collectors.model.Collector;
-import kr.kieran.collectors.util.Color;
+import kr.kieran.collectors.util.Text;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -37,8 +37,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class InteractListeners implements Listener
@@ -55,90 +56,102 @@ public class InteractListeners implements Listener
     @EventHandler(priority = EventPriority.NORMAL)
     public void open(PlayerInteractEvent event)
     {
-        // Args
-        Player player = event.getPlayer();
-        Block block = event.getClickedBlock();
-        if (block == null) return;
-        long chunkId = block.getChunk().getChunkKey();
-
-        // Check
-        if (player.isSneaking()) return;
-        if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (!plugin.getChunkManager().canUseChunk(chunkId))
+        try
         {
-            String message = plugin.getConfig().getString("messages.chunk-locked");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
-            event.setCancelled(true);
-            return;
+            Map<String, Object> attributes = this.isActionValid(event);
+            if (attributes.getOrDefault("success", Boolean.FALSE) == Boolean.TRUE)
+            {
+                Player player = (Player) attributes.get("player");
+                if (player.isSneaking()) return;
+
+                MenuGui menu = new MenuGui(plugin, (Collector) attributes.get("collector"));
+                menu.open(player);
+            }
         }
-
-        // Collector
-        Collector collector = plugin.getCollectorManager().getByLocation(block.getLocation());
-        if (collector == null) return;
-
-        // Cancel
-        event.setCancelled(true);
-
-        // Open
-        MenuGui menu = new MenuGui(plugin, collector);
-        menu.open(player);
+        catch (Exception ignored)
+        {
+        }
     }
 
     // LISTENER: COLLECTOR SELL
     @EventHandler(priority = EventPriority.NORMAL)
     public void sell(PlayerInteractEvent event)
     {
+        try
+        {
+            Map<String, Object> attributes = this.isActionValid(event);
+            if (attributes.getOrDefault("success", Boolean.FALSE) == Boolean.TRUE)
+            {
+                Player player = (Player) attributes.get("player");
+                if (!player.isSneaking()) return;
+                UUID uniqueId = player.getUniqueId();
+                long chunkId = (long) attributes.get("chunkId");
+
+                // Collector
+                Collector collector = (Collector) attributes.get("collector");
+                if (collector.isEmpty())
+                {
+                    Text.message(player, plugin.getConfig().getString("messages.collector-empty"));
+                    return;
+                }
+
+                // Money
+                double total = plugin.getCollectorManager().sell(collector);
+                plugin.getMoneyManager().queueMoney(uniqueId, total);
+
+                // Save & Inform
+                plugin.newChain()
+                        .async(() -> plugin.getCollectorManager().save(chunkId))
+                        .sync(() -> {
+                            // Deposit
+                            plugin.getMoneyManager().execute(uniqueId);
+
+                            // Inform
+                            Text.message(player, plugin.getConfig().getString("messages.contents-sold"), total);
+                        })
+                        .execute();
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
+    private Map<String, Object> isActionValid(PlayerInteractEvent event) throws Exception
+    {
+        // TODO: What the fuck am I doing here? Change this back to something that makes sense...
+
+        // Event attributes
+        Map<String, Object> attributes = new HashMap<>();
+
         // Args
         Player player = event.getPlayer();
-        UUID uniqueId = player.getUniqueId();
+        attributes.put("player", player);
         Block block = event.getClickedBlock();
-        if (block == null) return;
+        if (block == null) throw new Exception("Block is null");
+        attributes.put("block", block);
         long chunkId = block.getChunk().getChunkKey();
+        attributes.put("chunkId", chunkId);
 
         // Check
-        if (!player.isSneaking()) return;
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (!plugin.getChunkManager().canUseChunk(chunkId))
+        if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) throw new Exception("Incorrect collector material");
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) throw new Exception("Incorrect event action");
+        if (plugin.getChunkManager().isChunkBusy(chunkId))
         {
-            String message = plugin.getConfig().getString("messages.chunk-locked");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+            Text.message(player, plugin.getConfig().getString("messages.chunk-locked"));
             event.setCancelled(true);
-            return;
+            throw new Exception("Chunk is busy");
         }
 
         // Collector
         Collector collector = plugin.getCollectorManager().getByLocation(block.getLocation());
-        if (collector == null) return;
-        if (collector.isEmpty())
-        {
-            String message = plugin.getConfig().getString("messages.collector-empty");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
-            event.setCancelled(true);
-            return;
-        }
+        if (collector == null) throw new Exception("Collector is null");
+        attributes.put("collector", collector);
 
-        // Cancel
+        // All checks succeeded, cancel event and return
         event.setCancelled(true);
-
-        // Money
-        double total = plugin.getCollectorManager().sell(collector);
-        plugin.getMoneyManager().queueMoney(uniqueId, total);
-
-        // Save & Inform
-        plugin.newChain()
-                .async(() -> plugin.getCollectorManager().save(collector))
-                .sync(() -> {
-                    // Deposit
-                    plugin.getMoneyManager().execute(uniqueId);
-
-                    // Inform
-                    String message = plugin.getConfig().getString("messages.contents-sold");
-                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%total%", String.format("%,.1f", total))));
-                })
-                .execute();
+        attributes.put("success", Boolean.TRUE);
+        return attributes;
     }
 
 }

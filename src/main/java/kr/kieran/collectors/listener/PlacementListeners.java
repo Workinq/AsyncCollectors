@@ -25,6 +25,8 @@
 
 package kr.kieran.collectors.listener;
 
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainAbortAction;
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Text;
@@ -63,10 +65,9 @@ public class PlacementListeners implements Listener
         // Check
         ItemStack item = event.getItemInHand();
         if (item.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
-        if (item.getDurability() != plugin.getConfig().getInt("collectors.item.data")) return;
         ItemMeta meta = item.getItemMeta();
-        if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Color.color(plugin.getConfig().getString("collector.item.name")))) return;
-        if (!plugin.getChunkManager().canUseChunk(chunkId))
+        if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Text.color(plugin.getConfig().getString("collector.item.name")))) return;
+        if (plugin.getChunkManager().isChunkBusy(chunkId))
         {
             Text.message(player, plugin.getConfig().getString("messages.chunk-locked"));
             event.setCancelled(true);
@@ -86,16 +87,24 @@ public class PlacementListeners implements Listener
 
         // Create & Unlock
         plugin.newChain()
-                .asyncFirst(() -> plugin.getCollectorManager().create(chunkId, SerializationUtil.serialize(location)))
-                .abortIf(collector -> {
-                    // Check
-                    if (collector == null)
+                .asyncFirst(() -> plugin.getCollectorManager().create(chunkId, location))
+                .abortIfNull(new TaskChainAbortAction<>()
+                {
+                    @Override
+                    public void onAbort(TaskChain<?> chain, Object arg1)
                     {
-                        String message = plugin.getConfig().getString("messages.creation-field");
-                        if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
-                        return true;
+                        // Delete the block
+                        location.getBlock().setType(Material.AIR);
+
+                        // Refund the player
+                        player.getInventory().addItem(plugin.getCollector(1));
+
+                        // Unlock the chunk
+                        plugin.getChunkManager().unlock(chunkId);
+
+                        // Inform
+                        Text.message(player, plugin.getConfig().getString("messages.creation-fail"));
                     }
-                    return false;
                 })
                 .sync(() -> {
                     // Unlock
@@ -119,7 +128,7 @@ public class PlacementListeners implements Listener
 
         // Check
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
-        if (!plugin.getChunkManager().canUseChunk(chunkId))
+        if (plugin.getChunkManager().isChunkBusy(chunkId))
         {
             Text.message(player, plugin.getConfig().getString("messages.chunk-locked"));
             event.setCancelled(true);
@@ -144,16 +153,18 @@ public class PlacementListeners implements Listener
                     double total = plugin.getCollectorManager().sell(collector);
                     plugin.getMoneyManager().queueMoney(player.getUniqueId(), total);
                 })
-                .asyncFirst(() -> plugin.getCollectorManager().delete(collector))
-                .abortIf(toDelete -> {
-                    // Check
-                    if (toDelete == null)
+                .asyncFirst(() -> plugin.getCollectorManager().delete(chunkId))
+                .abortIfNull(new TaskChainAbortAction<>()
+                {
+                    @Override
+                    public void onAbort(TaskChain<?> chain, Object arg1)
                     {
-                        String message = plugin.getConfig().getString("messages.deletion-fail");
-                        if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
-                        return true;
+                        // Unlock the chunk
+                        plugin.getChunkManager().unlock(chunkId);
+
+                        // Inform
+                        Text.message(player, plugin.getConfig().getString("messages.deletion-fail"));
                     }
-                    return false;
                 })
                 .sync(() -> {
                     // Set & Drop

@@ -26,9 +26,19 @@
 package kr.kieran.collectors.listener.contents;
 
 import kr.kieran.collectors.CollectorsPlugin;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootContext;
+import org.bukkit.loot.LootTable;
+import org.bukkit.loot.LootTables;
+
+import java.util.Collection;
 
 public class DefaultContentsListener extends AbstractContentsListeners
 {
@@ -41,7 +51,14 @@ public class DefaultContentsListener extends AbstractContentsListeners
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void spawner(SpawnerSpawnEvent event)
     {
-        this.event(event, event.getEntityType(), event.getLocation());
+        this.spawnerEvent(event, event.getEntityType(), event.getEntity(), event.getLocation());
+    }
+
+    @Override
+    protected Collection<ItemStack> getItemsFromMob(EntityType entityType, Location location, Entity entity)
+    {
+        LootTable lootTable = LootTables.valueOf(entityType.name()).getLootTable();
+        return lootTable.populateLoot(null, new LootContext.Builder(location).lootedEntity(entity).build());
     }
 
 }
