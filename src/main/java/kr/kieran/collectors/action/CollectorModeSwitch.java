@@ -25,11 +25,33 @@
 
 package kr.kieran.collectors.action;
 
-public enum MenuAction
+import dev.triumphteam.gui.components.GuiAction;
+import kr.kieran.collectors.CollectorsPlugin;
+import kr.kieran.collectors.gui.SettingsGui;
+import kr.kieran.collectors.model.Collector;
+import org.bukkit.event.inventory.InventoryClickEvent;
+
+public class CollectorModeSwitch implements GuiAction<InventoryClickEvent>
 {
 
-    CONTENTS,
-    SETTINGS
-    ;
+    private final CollectorsPlugin plugin;
+    private final Collector collector;
+    private final SettingsGui gui;
+
+    public CollectorModeSwitch(CollectorsPlugin plugin, Collector collector, SettingsGui gui)
+    {
+        this.plugin = plugin;
+        this.collector = collector;
+        this.gui = gui;
+    }
+
+    @Override
+    public void execute(InventoryClickEvent event)
+    {
+        collector.setMode(collector.getMode().nextMode());
+        plugin.getCollectorManager().save(collector.getChunkId(), false);
+        // TODO: Add a cooldown period to switching modes (avoid saving to database too often)
+        gui.update();
+    }
 
 }

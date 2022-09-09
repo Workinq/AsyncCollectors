@@ -25,24 +25,21 @@
 
 package kr.kieran.collectors.gui;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.components.InteractionModifier;
 import dev.triumphteam.gui.guis.BaseGui;
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Text;
-import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
 
-public class MenuGui extends BaseGui
+public class EditorAddMenuGui extends BaseGui
 {
 
     private final CollectorsPlugin plugin;
     private final Collector collector;
 
-    public MenuGui(@NotNull CollectorsPlugin plugin, @NotNull Collector collector)
+    public EditorAddMenuGui(CollectorsPlugin plugin, Collector collector)
     {
-        super(plugin.getConfig().getInt("guis.menu.rows"), Text.color(plugin.getConfig().getString("guis.menu.name")), InteractionModifier.VALUES);
+        super(plugin.getConfig().getInt("guis.editor-add.rows"), Text.color(plugin.getConfig().getString("guis.editor-add.name")), InteractionModifier.VALUES);
 
         // Assign
         this.plugin = plugin;
@@ -54,32 +51,13 @@ public class MenuGui extends BaseGui
 
     private void populateGui()
     {
-        // TODO: Maybe I should keep this as a loop instead of hard-coding the items in the gui
+        // TODO: Use signs to enter an item to search for
+        // TODO: The user enters a string, match it with the list of materials and for every match
+        // TODO: Add it to a gui. If there are too many items make the user narrow down the search
+        // TODO: By providing a more precise search criteria
 
-        // Contents
-        String path = "guis.menu.items.contents";
-        this.setItem(
-                plugin.getConfig().getInt(path + ".slot"),
-                ItemBuilder
-                        .from(Material.getMaterial(plugin.getConfig().getString(path + ".material")))
-                        .setName(Text.color(plugin.getConfig().getString(path + ".name")))
-                        .setLore(Text.color(plugin.getConfig().getStringList(path + ".lore")))
-                        .asGuiItem(event -> new ContentsGui(plugin, collector).open(event.getWhoClicked()))
-        );
-
-        // Settings
-        path = "guis.menu.items.settings";
-        this.setItem(
-                plugin.getConfig().getInt(path + ".slot"),
-                ItemBuilder
-                        .from(Material.getMaterial(plugin.getConfig().getString(path + ".material")))
-                        .setName(Text.color(plugin.getConfig().getString(path + ".name")))
-                        .setLore(Text.color(plugin.getConfig().getStringList(path + ".lore")))
-                        .asGuiItem(event -> new SettingsGui(plugin, collector).open(event.getWhoClicked()))
-        );
-
-        // Filler
-        this.getFiller().fill(ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).asGuiItem());
+        // TODO: Use Conversation API to get materials the player would like to add
+        // TODO: Also use a GUI to pick materials from, this would be a big task...
     }
 
 }

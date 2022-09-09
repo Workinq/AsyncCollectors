@@ -23,13 +23,14 @@
  * SOFTWARE.
  */
 
-package kr.kieran.collectors.action;
+package kr.kieran.collectors.gui.menu;
 
-public enum SettingsAction
+public enum MenuAction
 {
 
-    MODE,
-    BLOCK_EDIT,
+    CONTENTS,
+    SETTINGS,
+
     ;
 
 }

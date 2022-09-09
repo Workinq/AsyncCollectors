@@ -23,23 +23,36 @@
  * SOFTWARE.
  */
 
-package kr.kieran.collectors.util;
+package kr.kieran.collectors.gui;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import dev.triumphteam.gui.components.InteractionModifier;
+import dev.triumphteam.gui.components.ScrollType;
+import kr.kieran.collectors.CollectorsPlugin;
+import kr.kieran.collectors.gui.type.RefreshScrollGui;
+import kr.kieran.collectors.model.Collector;
+import kr.kieran.collectors.util.Text;
 
-public class SerializationUtil
+public class EditorViewGui extends RefreshScrollGui
 {
 
-    public static String serialize(Location location)
+    private final CollectorsPlugin plugin;
+    private final Collector collector;
+
+    public EditorViewGui(CollectorsPlugin plugin, Collector collector)
     {
-        return "" + location.getWorld().getName() + ":" + location.getBlockX() + ":" + location.getBlockY() + ":" + location.getBlockZ() + "";
+        super(plugin, plugin.getConfig().getInt("guis.editor-view.rows"), plugin.getConfig().getInt("guis.editor-view.page-size"), Text.color(plugin.getConfig().getString("guis.editor-view.name")), ScrollType.VERTICAL, 20L, InteractionModifier.VALUES);
+
+        // Assign
+        this.plugin = plugin;
+        this.collector = collector;
+
+        // Populate
     }
 
-    public static Location deserialize(String serialized)
+    @Override
+    public void populateGui()
     {
-        String[] split = serialized.split(":");
-        return new Location(Bukkit.getWorld(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+        // TODO: Maybe add a limit to the number of items a collector can have whitelisted/blacklisted?
     }
 
 }

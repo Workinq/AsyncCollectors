@@ -27,23 +27,21 @@ package kr.kieran.collectors.gui;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.components.InteractionModifier;
+import dev.triumphteam.gui.guis.BaseGui;
 import kr.kieran.collectors.CollectorsPlugin;
-import kr.kieran.collectors.action.CollectorModeSwitch;
-import kr.kieran.collectors.gui.type.RefreshBaseGui;
 import kr.kieran.collectors.model.Collector;
 import kr.kieran.collectors.util.Text;
 import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
 
-public class SettingsGui extends RefreshBaseGui
+public class EditorMenuGui extends BaseGui
 {
 
     private final CollectorsPlugin plugin;
     private final Collector collector;
 
-    public SettingsGui(@NotNull CollectorsPlugin plugin, Collector collector)
+    public EditorMenuGui(CollectorsPlugin plugin, Collector collector)
     {
-        super(plugin, plugin.getConfig().getInt("guis.settings.rows"), Text.color(plugin.getConfig().getString("guis.settings.name")), 20L, InteractionModifier.VALUES);
+        super(plugin.getConfig().getInt("guis.editor.rows"), Text.color(plugin.getConfig().getString("guis.editor.name")), InteractionModifier.VALUES);
 
         // Assign
         this.plugin = plugin;
@@ -53,31 +51,34 @@ public class SettingsGui extends RefreshBaseGui
         this.populateGui();
     }
 
-    @Override
-    public void populateGui()
+    private void populateGui()
     {
-        // Mode
-        String path = "guis.settings.items.mode." + collector.getMode().getPathName();
-        this.setItem(
-                plugin.getConfig().getInt("guis.settings.items.mode.slot"),
-                ItemBuilder
-                        .from(Material.getMaterial(plugin.getConfig().getString(path + ".material")))
-                        .setName(Text.color(plugin.getConfig().getString(path + ".name")))
-                        .setLore(Text.color(plugin.getConfig().getStringList(path + ".lore")))
-                        .asGuiItem(new CollectorModeSwitch(plugin, collector, this)));
+        // TODO: Maybe I should keep this as a loop instead of hard-coding the items in the gui
 
-        // Item collection editor
-        path = "guis.settings.items.editor";
+        // View items
+        String path = "guis.editor.items.view-items";
         this.setItem(
                 plugin.getConfig().getInt(path + ".slot"),
                 ItemBuilder
                         .from(Material.getMaterial(plugin.getConfig().getString(path + ".material")))
                         .setName(Text.color(plugin.getConfig().getString(path + ".name")))
                         .setLore(Text.color(plugin.getConfig().getStringList(path + ".lore")))
-                        .asGuiItem(event -> new EditorMenuGui(plugin, collector).open(event.getWhoClicked())));
+                        .asGuiItem(/*event -> new EditorViewGui(plugin, collector).open(event.getWhoClicked())*/)
+        );
+
+        // Add items
+        path = "guis.editor.items.add-items";
+        this.setItem(
+                plugin.getConfig().getInt(path + ".slot"),
+                ItemBuilder
+                        .from(Material.getMaterial(plugin.getConfig().getString(path + ".material")))
+                        .setName(Text.color(plugin.getConfig().getString(path + ".name")))
+                        .setLore(Text.color(plugin.getConfig().getStringList(path + ".lore")))
+                        .asGuiItem(/*event -> new EditorAddMenuGui(plugin, collector).open(event.getWhoClicked())*/)
+        );
 
         // Filler
-        this.getFiller().fill(ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).setName(" ").asGuiItem());
+        this.getFiller().fill(ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).asGuiItem());
     }
 
 }
