@@ -47,7 +47,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.stream.Collectors;
+import java.util.logging.Level;
 
 public class CollectorsPlugin extends JavaPlugin
 {
@@ -134,10 +134,12 @@ public class CollectorsPlugin extends JavaPlugin
         {
             Class.forName("com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent");
             this.getServer().getPluginManager().registerEvents(new OptimisedContentsListener(this), this);
+            this.getLogger().log(Level.INFO, "Using optimised contents listener");
         }
         catch (ClassNotFoundException e)
         {
             this.getServer().getPluginManager().registerEvents(new DefaultContentsListener(this), this);
+            this.getLogger().log(Level.INFO, "Using default (unoptimised) contents listener");
         }
     }
 
