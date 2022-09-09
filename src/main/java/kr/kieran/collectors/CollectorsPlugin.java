@@ -39,8 +39,8 @@ import kr.kieran.collectors.listener.contents.OptimisedContentsListener;
 import kr.kieran.collectors.manager.ChunkManager;
 import kr.kieran.collectors.manager.CollectorManager;
 import kr.kieran.collectors.manager.MoneyManager;
-import kr.kieran.collectors.util.Color;
-import net.kyori.adventure.text.Component;
+import kr.kieran.collectors.task.CollectorSaveTask;
+import kr.kieran.collectors.util.Text;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -73,6 +73,10 @@ public class CollectorsPlugin extends JavaPlugin
     private MoneyManager moneyManager;
     public MoneyManager getMoneyManager() { return moneyManager; }
 
+    // TASK: COLLECTOR SAVE
+    private CollectorSaveTask saveTask;
+    public CollectorSaveTask getSaveTask() { return saveTask; }
+
     // TASK CHAIN
     private TaskChainFactory taskChain;
     public <T> TaskChain<T> newChain() { return taskChain.newChain(); }
@@ -93,6 +97,7 @@ public class CollectorsPlugin extends JavaPlugin
         this.registerManagers();
         this.registerCommands();
         this.registerListeners();
+        this.registerTasks();
     }
 
     @Override
@@ -134,6 +139,12 @@ public class CollectorsPlugin extends JavaPlugin
         {
             this.getServer().getPluginManager().registerEvents(new DefaultContentsListener(this), this);
         }
+    }
+
+    private void registerTasks()
+    {
+        saveTask = new CollectorSaveTask(this);
+        saveTask.runTaskTimerAsynchronously(this, 20L, 20L);
     }
 
     // ECONOMY
