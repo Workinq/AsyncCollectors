@@ -1,7 +1,10 @@
 CREATE TABLE IF NOT EXISTS `collectors_collectors` (
     `collector_id` BIGINT NOT NULL,
     `mode` VARCHAR(9) NOT NULL DEFAULT 'ALL',
-    `location` VARCHAR(255) NOT NULL,
+    `world` VARCHAR(255) NOT NULL,
+    `block_x` INT NOT NULL,
+    `block_y` INT NOT NULL,
+    `block_z` INT NOT NULL,
     CONSTRAINT `collectors_collectors_id_pk` PRIMARY KEY (`collector_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

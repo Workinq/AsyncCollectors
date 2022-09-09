@@ -138,7 +138,7 @@ public class CollectorManager
 
     /**
      * Load a collector from the database using the chunk key as the
-     * primary key. If a record doesn't exist {@link CollectorManager#create(long, String)}
+     * primary key. If a record doesn't exist {@link CollectorManager#create(long, Location)}
      * will be called to insert a new one into the database.
      *
      * @param chunkId the key for the chunk the collector is placed in
@@ -178,7 +178,12 @@ public class CollectorManager
                     contents.put(material, amount);
                 }
             }
-            String location = result.getString("location");
+            Location location = new Location(
+                    plugin.getServer().getWorld(result.getString("world")),
+                    result.getInt("block_x"),
+                    result.getInt("block_y"),
+                    result.getInt("block_z")
+            );
 
             // Collector
             Collector collector = new Collector(chunkId, contents, mode, location);
@@ -198,19 +203,22 @@ public class CollectorManager
      * Create a new collector at the given location
      *
      * @param chunkId  the generated chunk id
-     * @param location the serialised location of the collector
+     * @param location the location of the collector to be created
      * @return the collector after being created
      */
-    public Collector create(long chunkId, String location)
+    public Collector create(long chunkId, Location location)
     {
         try (
                 Connection connection = plugin.getDatabase().getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_collectors` (`collector_id`, `location`) VALUES (?, ?);")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO `collectors_collectors` (`collector_id`, `world`, `block_x`, `block_y`, `block_z`) VALUES (?, ?, ?, ?, ?);")
         )
         {
             // Set
             statement.setLong(1, chunkId);
-            statement.setString(2, location);
+            statement.setString(2, location.getWorld().getName());
+            statement.setInt(3, location.getBlockX());
+            statement.setInt(4, location.getBlockY());
+            statement.setInt(5, location.getBlockZ());
 
             // Update
             statement.executeUpdate();

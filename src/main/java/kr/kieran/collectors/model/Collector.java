@@ -25,7 +25,6 @@
 
 package kr.kieran.collectors.model;
 
-import kr.kieran.collectors.util.SerializationUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -66,10 +65,10 @@ public class Collector
     public void setMode(Mode mode) { this.mode = mode; }
 
     // LOCATION
-    private final String location;
-    public Location getLocation() { return location != null ? SerializationUtil.deserialize(location) : null; }
+    private final Location location;
+    public Location getLocation() { return location; }
 
-    public Collector(long chunkId, Map<Material, Integer> contents, Mode mode, String location)
+    public Collector(long chunkId, Map<Material, Integer> contents, Mode mode, Location location)
     {
         this.chunkId = chunkId;
         this.mode = mode;
