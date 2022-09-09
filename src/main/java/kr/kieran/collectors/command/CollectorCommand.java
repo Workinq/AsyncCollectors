@@ -26,7 +26,7 @@
 package kr.kieran.collectors.command;
 
 import kr.kieran.collectors.CollectorsPlugin;
-import kr.kieran.collectors.util.Color;
+import kr.kieran.collectors.util.Text;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,8 +50,7 @@ public class CollectorCommand implements CommandExecutor
         // Check
         if (args.length < 1)
         {
-            String message = plugin.getConfig().getString("messages.invalid-usage");
-            if (message != null && !message.isEmpty()) sender.sendMessage(Color.color(message));
+            Text.message(sender, plugin.getConfig().getString("messages.invalid-usage"));
             return true;
         }
 
@@ -59,8 +58,7 @@ public class CollectorCommand implements CommandExecutor
         Player target = plugin.getServer().getPlayer(args[0]);
         if (target == null)
         {
-            String message = plugin.getConfig().getString("messages.invalid-player");
-            if (message != null && !message.isEmpty()) sender.sendMessage(Color.color(message.replace("%player%", args[0])));
+            Text.message(sender, plugin.getConfig().getString("messages.invalid-player"), args[0]);
             return true;
         }
 
@@ -72,8 +70,7 @@ public class CollectorCommand implements CommandExecutor
         }
         catch (NumberFormatException e)
         {
-            String message = plugin.getConfig().getString("messages.invalid-number");
-            if (message != null && !message.isEmpty()) sender.sendMessage(Color.color(message.replace("%number%", args[1])));
+            Text.message(sender, plugin.getConfig().getString("messages.invalid-number"), args[1]);
             return true;
         }
 
@@ -89,10 +86,8 @@ public class CollectorCommand implements CommandExecutor
         }
 
         // Inform
-        String message = plugin.getConfig().getString("messages.gave-collector");
-        if (message != null && !message.isEmpty()) sender.sendMessage(Color.color(message.replace("%amount%", String.format("%,d", amount)).replace("%player%", target.getName())));
-        message = plugin.getConfig().getString("messages.received-collector");
-        if (message != null && !message.isEmpty()) target.sendMessage(Color.color(message.replace("%amount%", String.format("%,d", amount))));
+        Text.message(sender, plugin.getConfig().getString("messages.gave-collector"), amount, target.getName());
+        Text.message(target, plugin.getConfig().getString("messages.received-collector"), amount);
         return true;
     }
 

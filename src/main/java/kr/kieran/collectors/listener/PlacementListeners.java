@@ -27,8 +27,7 @@ package kr.kieran.collectors.listener;
 
 import kr.kieran.collectors.CollectorsPlugin;
 import kr.kieran.collectors.model.Collector;
-import kr.kieran.collectors.util.Color;
-import kr.kieran.collectors.util.SerializationUtil;
+import kr.kieran.collectors.util.Text;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,8 +68,7 @@ public class PlacementListeners implements Listener
         if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Color.color(plugin.getConfig().getString("collector.item.name")))) return;
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
-            String message = plugin.getConfig().getString("messages.chunk-locked");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+            Text.message(player, plugin.getConfig().getString("messages.chunk-locked"));
             event.setCancelled(true);
             return;
         }
@@ -78,8 +76,7 @@ public class PlacementListeners implements Listener
         // Exists
         if (plugin.getCollectorManager().exists(chunkId))
         {
-            String message = plugin.getConfig().getString("messages.collector-exists");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+            Text.message(player, plugin.getConfig().getString("messages.collector-exists"));
             event.setCancelled(true);
             return;
         }
@@ -105,8 +102,7 @@ public class PlacementListeners implements Listener
                     plugin.getChunkManager().unlock(chunkId);
 
                     // Inform
-                    String message = plugin.getConfig().getString("messages.placed-collector");
-                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message.replace("%x%", String.format("%,d", chunk.getX())).replace("%z%", String.format("%,d", chunk.getZ()))));
+                    Text.message(player, plugin.getConfig().getString("messages.placed-collector"), chunk.getX(), chunk.getZ());
                 })
                 .execute();
     }
@@ -125,8 +121,7 @@ public class PlacementListeners implements Listener
         if (block.getType() != Material.getMaterial(plugin.getConfig().getString("collector.item.material"))) return;
         if (!plugin.getChunkManager().canUseChunk(chunkId))
         {
-            String message = plugin.getConfig().getString("messages.chunk-locked");
-            if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+            Text.message(player, plugin.getConfig().getString("messages.chunk-locked"));
             event.setCancelled(true);
             return;
         }
@@ -143,8 +138,7 @@ public class PlacementListeners implements Listener
         plugin.newChain()
                 .sync(() -> {
                     // Inform
-                    String message = plugin.getConfig().getString("messages.removing-collector");
-                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+                    Text.message(player, plugin.getConfig().getString("messages.removing-collector"));
 
                     // Pay
                     double total = plugin.getCollectorManager().sell(collector);
@@ -171,8 +165,7 @@ public class PlacementListeners implements Listener
 
                     // Deposit & Inform
                     plugin.getMoneyManager().execute(player.getUniqueId());
-                    String message = plugin.getConfig().getString("messages.destroyed-collector");
-                    if (message != null && !message.isEmpty()) player.sendMessage(Color.color(message));
+                    Text.message(player, plugin.getConfig().getString("messages.destroyed-collector"));
                 })
                 .execute();
     }
