@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS `collectors_contents` (
     `material` VARCHAR(255) NOT NULL,
     `amount` INT NOT NULL,
     CONSTRAINT `collectors_contents_ck` PRIMARY KEY (`collector_id`, `material`),
-    CONSTRAINT `collectors_contents_id_fk`
-        FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`) ON DELETE CASCADE
+    CONSTRAINT `collectors_contents_id_fk` FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `collectors_items` (
+    `collector_id` BIGINT NOT NULL,
+    `material` VARCHAR(255) NOT NULL,
+    CONSTRAINT `collectors_items_fk` FOREIGN KEY (`collector_id`) REFERENCES `collectors_collectors` (`collector_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
