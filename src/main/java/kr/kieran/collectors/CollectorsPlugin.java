@@ -88,7 +88,7 @@ public class CollectorsPlugin extends JavaPlugin
     public void onEnable()
     {
         // Task
-        this.taskChain = BukkitTaskChainFactory.create(this);
+        taskChain = BukkitTaskChainFactory.create(this);
 
         // Economy
         this.setupEconomy();
@@ -103,19 +103,20 @@ public class CollectorsPlugin extends JavaPlugin
     @Override
     public void onDisable()
     {
-        this.moneyManager.disable();
-        this.collectorManager.disable();
-        this.chunkManager.disable();
-        this.database.disable();
+        saveTask.disable();
+        moneyManager.disable();
+        collectorManager.disable();
+        chunkManager.disable();
+        database.disable();
     }
 
     // REGISTER: MANAGERS
     private void registerManagers()
     {
-        this.database = new Database(this);
-        this.collectorManager = new CollectorManager(this);
-        this.chunkManager = new ChunkManager();
-        this.moneyManager = new MoneyManager(this);
+        database = new Database(this);
+        collectorManager = new CollectorManager(this);
+        chunkManager = new ChunkManager();
+        moneyManager = new MoneyManager(this);
     }
 
     // REGISTER: COMMANDS
@@ -157,12 +158,12 @@ public class CollectorsPlugin extends JavaPlugin
         if (this.getServer().getPluginManager().getPlugin("Vault") == null) return;
         RegisteredServiceProvider<Economy> provider = this.getServer().getServicesManager().getRegistration(Economy.class);
         if (provider == null) return;
-        this.economy = provider.getProvider();
+        economy = provider.getProvider();
     }
 
     public ItemStack getCollector(int amount)
     {
-        return ItemBuilder.from(Material.getMaterial(this.getConfig().getString("collector.item.material"))).name(Component.text(Color.color(this.getConfig().getString("collector.item.name")))).lore(Color.color(this.getConfig().getStringList("collector.item.lore")).stream().map(Component::text).collect(Collectors.toList())).amount(amount).build();
+        return ItemBuilder.from(Material.getMaterial(this.getConfig().getString("collector.item.material"))).setName(Text.color(this.getConfig().getString("collector.item.name"))).setLore(Text.color(this.getConfig().getStringList("collector.item.lore"))).amount(amount).build();
     }
 
 }
