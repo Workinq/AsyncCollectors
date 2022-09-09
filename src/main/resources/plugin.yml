@@ -4,6 +4,8 @@ version: ${project.version}
 author: ${project.author}
 api-version: 1.16
 depend: [Vault]
+libraries:
+  - com.zaxxer:HikariCP:5.0.1
 commands:
   collector:
     usage: /<command> <player> <amount>
