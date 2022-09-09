@@ -70,22 +70,22 @@ public class Database
         plugin.getLogger().log(Level.INFO, "Setting up database environment...");
 
         // Driver & pool size
-        this.dataSource.setMaximumPoolSize(10);
-        this.dataSource.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
+        dataSource.setMaximumPoolSize(10);
+        dataSource.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
 
         // Credentials
-        this.dataSource.addDataSourceProperty("serverName", plugin.getConfig().getString("mysql.host"));
-        this.dataSource.addDataSourceProperty("port", plugin.getConfig().getString("mysql.port"));
-        this.dataSource.addDataSourceProperty("databaseName", plugin.getConfig().getString("mysql.database"));
-        this.dataSource.addDataSourceProperty("user", plugin.getConfig().getString("mysql.user"));
-        this.dataSource.addDataSourceProperty("password", plugin.getConfig().getString("mysql.password"));
+        dataSource.addDataSourceProperty("serverName", plugin.getConfig().getString("mysql.host"));
+        dataSource.addDataSourceProperty("port", plugin.getConfig().getString("mysql.port"));
+        dataSource.addDataSourceProperty("databaseName", plugin.getConfig().getString("mysql.database"));
+        dataSource.addDataSourceProperty("user", plugin.getConfig().getString("mysql.user"));
+        dataSource.addDataSourceProperty("password", plugin.getConfig().getString("mysql.password"));
 
         // Properties
-        this.dataSource.addDataSourceProperty("cachePrepStmts", true);
-        this.dataSource.addDataSourceProperty("prepStmtCacheSize", 250);
-        this.dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
-        this.dataSource.addDataSourceProperty("useServerPrepStmts", true);
-        this.dataSource.addDataSourceProperty("rewriteBatchedStatements", true);
+        dataSource.addDataSourceProperty("cachePrepStmts", true);
+        dataSource.addDataSourceProperty("prepStmtCacheSize", 250);
+        dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+        dataSource.addDataSourceProperty("useServerPrepStmts", true);
+        dataSource.addDataSourceProperty("rewriteBatchedStatements", true);
     }
 
     /**
@@ -94,6 +94,7 @@ public class Database
      */
     private void setupTables() throws SQLException
     {
+        // TODO: Perform this operation asynchronously and ensure the tables are created before any collectors are loaded
         String setup;
         try (InputStream in = CollectorsPlugin.class.getClassLoader().getResourceAsStream("dbtables.sql"))
         {
@@ -129,8 +130,8 @@ public class Database
      * @return a connection to execute queries
      * @throws SQLException if something went wrong throw an exception
      */
-    public Connection getConnection() throws SQLException { return this.dataSource.getConnection(); }
+    public Connection getConnection() throws SQLException { return dataSource.getConnection(); }
 
-    public void disable() { this.dataSource.close(); }
+    public void disable() { dataSource.close(); }
 
 }

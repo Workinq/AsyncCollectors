@@ -67,7 +67,7 @@ public class CollectorManager
      */
     public Collector getByLocation(Location location)
     {
-        for (Collector collector : this.cache.values())
+        for (Collector collector : cache.values())
         {
             if (collector.getLocation().equals(location)) return collector;
         }
@@ -126,8 +126,7 @@ public class CollectorManager
      */
     public void invalidate(long chunkId)
     {
-        this.cache.remove(chunkId);
-        plugin.getChunkManager().untrack(chunkId);
+        cache.remove(chunkId);
     }
 
     // CONSTRUCT
@@ -189,7 +188,7 @@ public class CollectorManager
             Collector collector = new Collector(chunkId, contents, mode, location);
 
             // Cache
-            this.cache.put(chunkId, collector);
+            cache.put(chunkId, collector);
             return collector;
         }
         catch (SQLException e)
@@ -227,7 +226,7 @@ public class CollectorManager
             Collector collector = new Collector(chunkId, new HashMap<>(), Collector.Mode.ALL, location);
 
             // Save
-            this.cache.put(chunkId, collector);
+            cache.put(chunkId, collector);
             return collector;
         }
         catch (SQLException e)
@@ -263,7 +262,7 @@ public class CollectorManager
             statement.executeUpdate();
 
             // Cache
-            return this.cache.remove(chunkId);
+            return cache.remove(chunkId);
         }
         catch (SQLException e)
         {
@@ -436,7 +435,7 @@ public class CollectorManager
      */
     public void disable()
     {
-        this.cache.clear();
+        cache.clear();
     }
 
 }

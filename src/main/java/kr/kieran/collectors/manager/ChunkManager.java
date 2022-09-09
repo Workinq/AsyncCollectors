@@ -49,7 +49,7 @@ public class ChunkManager
      */
     public synchronized void lock(long chunkId)
     {
-        this.lockedChunks.add(chunkId);
+        lockedChunks.add(chunkId);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ChunkManager
      */
     public synchronized void unlock(long chunkId)
     {
-        this.lockedChunks.remove(chunkId);
+        lockedChunks.remove(chunkId);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ChunkManager
      */
     public boolean isLocked(long chunkId)
     {
-        return this.lockedChunks.contains(chunkId);
+        return lockedChunks.contains(chunkId);
     }
 
     // --------------------- //
@@ -88,7 +88,7 @@ public class ChunkManager
      */
     public void track(long chunkId)
     {
-        this.trackedChunks.add(chunkId);
+        trackedChunks.add(chunkId);
     }
 
     /**
@@ -100,8 +100,7 @@ public class ChunkManager
      */
     public void untrack(long chunkId)
     {
-        this.trackedChunks.remove(chunkId);
-        this.unlock(chunkId);
+        trackedChunks.remove(chunkId);
     }
 
     /**

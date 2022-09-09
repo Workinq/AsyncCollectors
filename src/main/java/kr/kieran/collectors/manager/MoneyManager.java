@@ -62,10 +62,10 @@ public class MoneyManager
     {
         OfflinePlayer player = plugin.getServer().getOfflinePlayer(uniqueId);
         if (!owedMoney.asMap().containsKey(uniqueId) || !player.hasPlayedBefore()) return;
-        Double amount = this.owedMoney.getIfPresent(uniqueId);
+        Double amount = owedMoney.getIfPresent(uniqueId);
         if (amount == null) return;
         plugin.getEconomy().depositPlayer(player, amount);
-        this.owedMoney.invalidate(uniqueId);
+        owedMoney.invalidate(uniqueId);
     }
 
     public void pay(UUID uniqueId, double amount)
@@ -78,8 +78,8 @@ public class MoneyManager
     // DISABLE
     public void disable()
     {
-        this.owedMoney.asMap().keySet().forEach(this::execute);
-        this.owedMoney.invalidateAll();
+        owedMoney.asMap().keySet().forEach(this::execute);
+        owedMoney.invalidateAll();
     }
 
 }
