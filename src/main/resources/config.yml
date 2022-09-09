@@ -22,17 +22,17 @@ guis:
       contents:
         material: GRASS_BLOCK
         name: '&fContents'
+        lore: []
         slot: 11
         action: CONTENTS
       settings:
         material: CLOCK
         name: '&fSettings'
+        lore: []
         slot: 15
         action: SETTINGS
   contents:
     name: '&cCollector - Contents'
-    variable-rows: true # if true, rows will be adjusted depending on amount of items
-    rows: 5 # 45 slots in total
     item:
       lore:
         - '&7Amount: &f%amount%'
@@ -46,7 +46,6 @@ guis:
       mode:
         slot: 11
         name: '&fCollector Mode'
-        action: MODE
         whitelist:
           material: WHITE_WOOL
           lore:
@@ -84,25 +83,49 @@ guis:
         slot: 13
         material: STONE
         name: '&fEdit Blocks'
-        action: BLOCK_EDIT
+        lore: []
+  editor:
+    name: '&cCollector - Editor'
+    rows: 3
+    items:
+      view-items:
+        slot: 11
+        material: PAPER
+        name: '&fView Items'
+        lore:
+          - '&7Click here to view a list of all the items'
+          - '&7this collector interacts with. Depending on the'
+          - '&7collector''s mode, these items can either be'
+          - '&fwhitelisted &7or &fblacklisted&7. This can be'
+          - '&7changed in the collector''s settings menu.'
+          - ''
+          - '&7Items can also be removed from the list by'
+          - '&fleft-clicking &7them in this menu.'
+      add-items:
+        slot: 15
+        material: GRASS_BLOCK
+        name: '&fAdd Items'
+        lore:
+          - '&fLeft-click &7here to add items which the collector'
+          - '&7will collect.'
 
 messages:
   no-permission: '&cYou do not have permission to use this command.'
   invalid-usage: '&cInvalid command usage: /collector <player> [amount].'
-  invalid-player: '&cCould not find the player ''%player%''.'
-  invalid-number: '&c%number% is not a valid number.'
-  gave-collector: '&aSuccessfully gave &e%amount%x &acollector(s) to &e%player%&a.'
-  received-collector: '&eYou &areceived &e%amount%x &acollector(s).'
+  invalid-player: '&cCould not find the player ''%s''.'
+  invalid-number: '&c%s is not a valid number.'
+  gave-collector: '&aSuccessfully gave &e%,dx &acollector(s) to &e%s&a.'
+  received-collector: '&eYou &areceived &e%,dx &acollector(s).'
   chunk-locked: '&cYou can''t modify collectors in this chunk at the moment.'
   collector-exists: '&cThere is already a collector in this chunk.'
   creation-fail: '&cAn issue occurred whilst trying to create a new collector.'
-  placed-collector: '&aSuccessfully placed a collector at the chunk &ex: %x%&a, &ez: %z%&a.'
+  placed-collector: '&aSuccessfully placed a collector at the chunk &ex: %,d&a, &ez: %,d&a.'
   deletion-fail: '&cAn issue occurred whilst trying to delete the collector.'
   destroyed-collector: '&aYou destroyed a collector, all the contents were sold.'
   collector-empty: '&cThere are no contents that can be sold in this collector.'
-  contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%total%&a.'
-  material-sold: '&aSuccessfully sold &e%amount%x &aof &e%material% &afor &e$%total%&a.'
-  cannot-sell-item: '&cYou cannot sell &e%item%&c.'
+  contents-sold: '&aSuccessfully sold all the collector''s contents for &e$%,.1f&a.'
+  material-sold: '&aSuccessfully sold &e%,dx &aof &e%s &afor &e$%,.1f&a.'
+  cannot-sell-item: '&cYou cannot sell &e%s&c.'
   removing-collector: '&aPlease wait whilst this collector is cleared from the database.'
 
 drops:
